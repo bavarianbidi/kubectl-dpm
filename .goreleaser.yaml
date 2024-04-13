@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: MIT
+project_name: kubectl-dpm
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    main: ./cmd/kubectl-dpm.go
+
+archives:
+  - format: binary
+
+checksum:
+  name_template: "checksums.txt"
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  sort: asc
+  use: github
+  groups:
+    - title: "✨ Features"
+      regexp: '^.*?feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: "🐛 Bug fixes"
+      regexp: '^.*?fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: "📚 Documentation"
+      regexp: '^.*?docs(\([[:word:]]+\))??!?:.+$'
+      order: 2
+    - title: "🌱 Others"
+      order: 999
+  filters:
+    exclude:
+      - "^test:"
+release:
+  github:
+    owner: bavarianbidi
+    name: kubectl-dpm
+  prerelease: auto
