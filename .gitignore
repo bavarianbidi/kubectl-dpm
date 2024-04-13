@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: MIT
+
+cover.out
+bin/
+tmp/
+.vscode/
+kubectl-dpm
