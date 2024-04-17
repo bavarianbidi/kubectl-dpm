@@ -1,6 +1,6 @@
 <!-- SPDX-License-Identifier: MIT -->
 
-# `dpm`
+# `dpm` the `kubectl debug-profile-manager`
 
 The `dpm` is a `kubectl` plugin build to share custom debug profiles with others.
 
