@@ -15,7 +15,7 @@ builds:
     main: ./cmd/kubectl-dpm.go
 
 archives:
-  - format: binary
+  - format: tar.gz
 
 checksum:
   name_template: "checksums.txt"
