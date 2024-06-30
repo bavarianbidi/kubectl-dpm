@@ -1,0 +1,20 @@
+{
+    "volumeMounts": [
+        {
+            "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+            "name": "kube-api-access-zvd6j",
+            "readOnly": true
+        },
+        {
+            "mountPath": "/etc/prom-config",
+            "name": "config-volume",
+            "readOnly": true
+        }
+    ],
+    "env": [
+        {
+            "name": "KCD_MUNICH",
+            "value": "Servus Minga!"
+        }
+    ]
+}

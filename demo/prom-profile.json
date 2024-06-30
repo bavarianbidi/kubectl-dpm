@@ -1,0 +1,9 @@
+{
+    "volumeMounts": [
+        {
+            "mountPath": "/var/run/secrets/kubernetes.io/serviceaccount",
+            "name": "kube-api-access-s44z7",
+            "readOnly": true
+        }
+    ]
+}
