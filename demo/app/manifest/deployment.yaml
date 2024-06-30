@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: webapp
+  name: webapp
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: webapp
+  template:
+    metadata:
+      labels:
+        run: webapp
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+    spec:
+      shareProcessNamespace: true
+      containers:
+        - image: quay.io/bavarianbidi/demo-app:latest
+          args: ["-metric=127.0.0.1:9090", "-template=/index.tmpl"]
+          name: webapp
+          env:
+            - name: SERVER_VERSION
+              value: v1.0.0
+            - name: SERVER_TITLE
+              value: "Conference 2024"
+            - name: SERVER_MESSAGE
+              value: "Welcome to Conference 2024"
+          ports:
+            - name: app
+              containerPort: 8080
+              protocol: TCP
+            - name: metrics
+              containerPort: 9090
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8080
+              scheme: HTTP
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: 8080
+              scheme: HTTP
+          volumeMounts:
+            - name: app-config
+              mountPath: /conf
+      volumes:
+        - name: app-config
+          configMap:
+            name: app-config

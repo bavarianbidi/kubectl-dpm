@@ -1,0 +1,16 @@
+profiles:
+  - name: prometheus
+    profile: /home/comario/go/src/github.com/bavarianbidi/kubectl-dpm/demo/debug-profiles/prom-profile-config.json
+    image: nicolaka/netshoot:v0.13
+    namespace: default
+    matchLabels:
+      app.kubernetes.io/name: prometheus
+  - name: webapp
+    profile: /home/comario/go/src/github.com/bavarianbidi/kubectl-dpm/demo/debug-profiles/app-profile-config.json
+    image: nicolaka/netshoot:v0.13
+    namespace: default
+    matchLabels:
+      run: webapp
+  - name: demo
+    profile: /home/comario/go/src/github.com/bavarianbidi/kubectl-dpm/demo/debug-profiles/app-profile-config.json
+    image: nicolaka/netshoot:v0.13

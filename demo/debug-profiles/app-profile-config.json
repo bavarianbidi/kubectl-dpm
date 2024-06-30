@@ -1,0 +1,22 @@
+{
+    "volumeMounts": [
+        {
+            "mountPath": "/app/config",
+            "name": "app-config",
+            "readOnly": true
+        }
+    ],
+    "securityContext": {
+        "capabilities": {
+            "add": [
+                "CAP_NET_ADMIN"
+            ]
+        }
+    },
+    "env": [
+        {
+            "name": "DEMO",
+            "value": "Hello Conference"
+        }
+    ]
+}
