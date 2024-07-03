@@ -1,0 +1,19 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: app-config
+  namespace: default
+data:
+  index.tmpl: |+
+    <h1>DEMO APP</h1>
+    <h1>{{.Title}}</h1>
+    <h2>{{.Message}}</h2>
+
+    <p>
+    <tt>
+    Hostname: {{.Hostname}}</br>
+    Version: {{.Version}}</br>
+    RemoteAddress: {{.RemoteAddress}}
+    </tt>
+    </p>
+
