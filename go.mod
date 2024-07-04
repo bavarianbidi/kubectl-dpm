@@ -2,7 +2,7 @@
 
 module github.com/bavarianbidi/kubectl-dpm
 
-go 1.22.2
+go 1.22.5
 
 require (
 	github.com/knadh/koanf v1.5.0
