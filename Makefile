@@ -125,7 +125,7 @@ KBOM ?= $(LOCALBIN)/bom
 
 ## Tool Versions
 GOLANGCI_LINT_VERSION ?= v1.55.2
-GORELEASER_VERSION ?= v1.21.0
+GORELEASER_VERSION ?= v2.0.1
 NANCY_VERSION ?= v1.0.46
 KBOM_VERSION ?= v0.5.1
 
@@ -139,7 +139,7 @@ $(GOLANGCI_LINT): $(LOCALBIN)
 goreleaser: $(GORELEASER) ## Download goreleaser locally if necessary. If wrong version is installed, it will be overwritten.
 $(GORELEASER): $(LOCALBIN)
 	test -s $(LOCALBIN)/goreleaser && $(LOCALBIN)/goreleaser --version | grep -q $(GORELEASER_VERSION) || \
-	GOBIN=$(LOCALBIN) go install github.com/goreleaser/goreleaser@$(GORELEASER_VERSION)
+	GOBIN=$(LOCALBIN) go install github.com/goreleaser/goreleaser/v2@$(GORELEASER_VERSION)
 
 .PHONY: nancy
 nancy: $(NANCY) ## Download nancy locally if necessary. If wrong version is installed, it will be overwritten.
