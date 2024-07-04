@@ -34,6 +34,8 @@ func main() {
 	)
 	// validation sub command
 	root.AddCommand(command.ValidateDebugProfileFile())
+	root.AddCommand(command.Version())
+
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
 	}

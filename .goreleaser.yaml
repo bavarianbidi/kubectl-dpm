@@ -12,10 +12,18 @@ builds:
     goarch:
       - amd64
       - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/bavarianbidi/kubectl-dpm/pkg/command.appVersion={{.Version}}
+      - -X github.com/bavarianbidi/kubectl-dpm/pkg/command.buildDate={{.Date}}
+      - -X github.com/bavarianbidi/kubectl-dpm/pkg/command.gitCommit={{.Commit}}
     main: ./cmd/kubectl-dpm.go
 
 archives:
-  - format: tar.gz
+  - id: "tar ball"
+    format: tar.gz
+  - id: "binary"
+    format: binary
 
 checksum:
   name_template: "checksums.txt"
