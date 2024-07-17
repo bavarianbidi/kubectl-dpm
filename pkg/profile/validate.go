@@ -4,6 +4,7 @@ package profile
 
 import (
 	"cmp"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -35,7 +36,7 @@ func ValidateKubectlPath() error {
 		Config.KubectlPath = os.Getenv("_")
 	} else {
 		// check if configured kubectl path is valid
-		info, err := os.Stat(Config.KubectlPath)
+		info, err := os.Stat(os.ExpandEnv(Config.KubectlPath))
 		if os.IsNotExist(err) {
 			return fmt.Errorf("kubectl %s does not exist", Config.KubectlPath)
 		}
@@ -88,16 +89,39 @@ func ValidateAllProfiles() error {
 // This function is not implemented yet
 // future ideas: check if the profile file exists and
 // it's a valid pod.spec
-func ValidateProfile(_ string) error {
+func ValidateProfile(profileName string) error {
+	idx := slices.IndexFunc(Config.Profiles,
+		func(c Profile) bool { return c.ProfileName == profileName },
+	)
+
+	if err := validatePodSpec(Config.Profiles[idx].CustomProfileFile); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func validatePodSpec(podSpec string) error {
+	podSpecByte, err := os.ReadFile(os.ExpandEnv(podSpec))
+	if err != nil {
+		return err
+	}
+
+	pod := corev1.PodSpec{}
+
+	if err := json.Unmarshal(podSpecByte, &pod); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func ValidateAndCompleteProfile(profileName string) error {
-	if err := ValidateProfile(profileName); err != nil {
+	if err := CompleteProfile(profileName); err != nil {
 		return err
 	}
 
-	if err := CompleteProfile(profileName); err != nil {
+	if err := ValidateProfile(profileName); err != nil {
 		return err
 	}
 	return nil

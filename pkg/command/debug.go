@@ -124,9 +124,9 @@ func (o *CustomDebugOptions) run(streams genericiooptions.IOStreams, args []stri
 		func(c profile.Profile) bool { return c.ProfileName == flagProfileName },
 	)
 
-	fmt.Printf("Profile: %+v\n", debugProfile)
-
 	debugProfile = profile.Config.Profiles[idx]
+
+	fmt.Printf("Profile: %+v\n", debugProfile)
 
 	// this is not needed atm as we want support kubectl versions < 1.30
 	//
@@ -144,7 +144,7 @@ func (o *CustomDebugOptions) run(streams genericiooptions.IOStreams, args []stri
 }
 
 func (o *CustomDebugOptions) prepareEphemeralContainer(streams genericiooptions.IOStreams, args []string) error {
-	o.DebugOptions.CustomProfileFile = debugProfile.CustomProfileFile
+	o.DebugOptions.CustomProfileFile = os.ExpandEnv(debugProfile.CustomProfileFile)
 	o.DebugOptions.Profile = kubectldebug.ProfileLegacy
 
 	// use image from profile

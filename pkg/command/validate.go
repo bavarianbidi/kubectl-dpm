@@ -3,7 +3,7 @@
 package command
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/spf13/cobra"
 
@@ -25,9 +25,7 @@ func ValidateDebugProfileFile() *cobra.Command {
 				return err
 			}
 
-			log.Printf("all profiles are valid\n")
-			log.Printf("kubectl path: %s\n", profile.Config.KubectlPath)
-			log.Printf("profiles: %v\n", profile.Config.Profiles)
+			fmt.Printf("all profiles are valid\n")
 
 			return nil
 		},
