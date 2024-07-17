@@ -6,6 +6,8 @@ The `dpm` is a `kubectl` plugin build to share custom debug profiles with others
 
 *Pull requests, bug reports, and all other forms of contribution are welcomed and highly encouraged!* :heart:
 
+![demo](./kubectl-dpm.gif)
+
 ## `kubectl` custom debug profiles
 
 With `kubectl v1.30` an alpha feature has landed to make it much more easier to create an `ephemeral` debug container by defining a custom profile which gets applied to the debug container.

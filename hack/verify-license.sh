@@ -18,7 +18,7 @@ array_contains() {
 HEADER="SPDX-License-Identifier: MIT"
 
 export IFS=$'\n'
-while IFS='' read -r line; do all_error_files+=("$line"); done < <(git ls-files | grep -v -E '\.yaml$|\.json$|^(go.sum|LICENSE|demo/app/go.sum)$')
+while IFS='' read -r line; do all_error_files+=("$line"); done < <(git ls-files | grep -v -E '\.yaml$|\.json$|^(go.sum|LICENSE|demo/app/go.sum|kubectl-dpm.gif)$')
 unset IFS
 
 errors=()
