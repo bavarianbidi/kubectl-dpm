@@ -32,7 +32,10 @@ With the below `pod.Spec` in json format as debug profile name (`PATH_TO_CUSTOM_
 
 ## why `dpm`
 
-As of now, `kubectl` in `v1.30` didn't got released yet. To get familiar with custom debug profiles, this wrapper got created.
+Initially `kubectl-dpm` was build to get more familiar with the custom debug profile feature. Till version `v0.0.4` the `kubectl-dpm` plugin was adopting many
+internal `func` from the `kubectl` implementation to make it more easier to create a custom debug profile.
+
+Starting with version `v0.1.0` the `kubectl-dpm` is now focused on managing multiple custom debug profiles. `kubectl-dpm` discovers the path to `kubectl` and uses it to start a debugging container.
 
 ### Lower the barrier for having minimal container images for application workload
 
@@ -106,13 +109,11 @@ As target container, the first running container with the matching `matchLabels`
 
 ### `kubectlPath`
 
-The `kubectlPath` field is optional and can be used to define the path to the `kubectl` binary.
-To directly access a debug container, `dpm` is starting `kubectl attach`.
-
-For now, `dpm` is using the value of the `_` environment variable to determine the path to the `kubectl` binary.
+`dpm` needs to know where the `kubectl` binary is located. By default,
+`dpm` is using the value of the `_` environment variable to determine the path to the `kubectl` binary.
 This only works, if the `dpm` is run as a `kubectl` plugin.
 
-As standalone binary, the `kubectlPath` field is needed to define the path to the `kubectl` binary.
+As standalone binary, the `kubectlPath` value must be defined.
 
 ## flags
 
