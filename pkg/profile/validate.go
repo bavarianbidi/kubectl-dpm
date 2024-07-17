@@ -85,10 +85,6 @@ func ValidateAllProfiles() error {
 }
 
 // ValidateProfile validates a single profile
-//
-// This function is not implemented yet
-// future ideas: check if the profile file exists and
-// it's a valid pod.spec
 func ValidateProfile(profileName string) error {
 	idx := slices.IndexFunc(Config.Profiles,
 		func(c Profile) bool { return c.ProfileName == profileName },

@@ -5,4 +5,5 @@ package command
 var (
 	flagProfileName string
 	flagImage       string
+	flagDebug       bool
 )
