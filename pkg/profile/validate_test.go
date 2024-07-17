@@ -67,19 +67,19 @@ func TestValidateAllProfiles(t *testing.T) {
 				Profiles: []Profile{
 					{
 						ProfileName:       "profile1",
-						CustomProfileFile: "profile1.yaml",
+						CustomProfileFile: "test_data/profile1.json",
 						Image:             "busybox",
 						Namespace:         "default",
 						ImagePullPolicy:   "Always",
 					},
 					{
 						ProfileName:       "profile2",
-						CustomProfileFile: "profile2.yaml",
+						CustomProfileFile: "test_data/profile2.json",
 						Image:             "busybox",
 					},
 					{
 						ProfileName:       "profile2",
-						CustomProfileFile: "profile2.yaml",
+						CustomProfileFile: "test_data/profile2.json",
 					},
 				},
 			},
@@ -87,14 +87,14 @@ func TestValidateAllProfiles(t *testing.T) {
 				Profiles: []Profile{
 					{
 						ProfileName:       "profile1",
-						CustomProfileFile: "profile1.yaml",
+						CustomProfileFile: "test_data/profile1.json",
 						Image:             "busybox",
 						Namespace:         "default",
 						ImagePullPolicy:   "Always",
 					},
 					{
 						ProfileName:       "profile2",
-						CustomProfileFile: "profile2.yaml",
+						CustomProfileFile: "test_data/profile2.json",
 						Image:             "busybox",
 					},
 				},
@@ -106,7 +106,7 @@ func TestValidateAllProfiles(t *testing.T) {
 				Profiles: []Profile{
 					{
 						ProfileName:       "profile1",
-						CustomProfileFile: "profile1.yaml",
+						CustomProfileFile: "test_data/profile1.json",
 						Image:             "busybox",
 						Namespace:         "default",
 						ImagePullPolicy:   "Always",
@@ -124,13 +124,13 @@ func TestValidateAllProfiles(t *testing.T) {
 				Profiles: []Profile{
 					{
 						ProfileName:       "profile1",
-						CustomProfileFile: "profile1.yaml",
+						CustomProfileFile: "test_data/profile1.json",
 						Image:             "busybox",
 						Namespace:         "default",
 						ImagePullPolicy:   "Always",
 					},
 					{
-						CustomProfileFile: "profile2.yaml",
+						CustomProfileFile: "test_data/profile2.json",
 					},
 				},
 			},
