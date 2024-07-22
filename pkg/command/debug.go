@@ -61,9 +61,9 @@ func NewCmdDebugProfile(_ genericiooptions.IOStreams) *cobra.Command {
 	kubeConfigFlags.AddFlags(flags)
 
 	// add custom flag
-	cmd.Flags().StringVar(&flagProfileName, "profile", "", "profile name")
-	cmd.Flags().StringVar(&flagImage, "image", "", "image to use for the debug container")
-	cmd.Flags().BoolVar(&flagDebug, "debug", false, "print debug information")
+	cmd.Flags().StringVarP(&flagProfileName, "profile", "p", "", "profile name")
+	cmd.Flags().StringVarP(&flagImage, "image", "i", "", "image to use for the debug container")
+	cmd.Flags().BoolVarP(&flagDebug, "debug", "d", false, "print debug information")
 
 	return cmd
 }
