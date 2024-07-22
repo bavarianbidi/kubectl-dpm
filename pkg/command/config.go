@@ -6,4 +6,5 @@ var (
 	flagProfileName string
 	flagImage       string
 	flagDebug       bool
+	flagVerboseList bool
 )

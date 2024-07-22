@@ -3,7 +3,6 @@
 package profile
 
 import (
-	"cmp"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -54,9 +53,7 @@ func ValidateKubectlPath() error {
 
 func ValidateAllProfiles() error {
 	// sort profiles by name
-	slices.SortFunc(Config.Profiles, func(a, b Profile) int {
-		return cmp.Compare(strings.ToLower(a.ProfileName), strings.ToLower(b.ProfileName))
-	})
+	SortProfiles()
 
 	compactProfiles := slices.CompactFunc(Config.Profiles, func(a, b Profile) bool {
 		if strings.EqualFold(a.ProfileName, b.ProfileName) {
