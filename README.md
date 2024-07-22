@@ -1,5 +1,10 @@
 <!-- SPDX-License-Identifier: MIT -->
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/bavarianbidi/kubectl-dpm)](https://goreportcard.com/report/github.com/bavarianbidi/kubectl-dpm)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/bavarianbidi/kubectl-dpm?sort=semver)
+[![build](https://github.com/bavarianbidi/kubectl-dpm/actions/workflows/build.yaml/badge.svg)](https://github.com/bavarianbidi/kubectl-dpm/actions/workflows/build.yaml)
+[![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/bavarianbidi/kubectl-dpm/badge)](https://scorecard.dev/viewer/?uri=github.com/bavarianbidi/kubectl-dpm)
+
 # `dpm` the `kubectl debug-profile-manager`
 
 The `dpm` is a `kubectl` plugin build to share custom debug profiles with others.
