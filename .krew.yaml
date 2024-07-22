@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: MIT
+apiVersion: krew.googlecontainertools.github.com/v1alpha2
+kind: Plugin
+metadata:
+  name: dpm
+spec:
+  version: "{{ .TagName }}"
+  homepage: https://github.com/bavarianbidi/kubectl-dpm
+  shortDescription: "Manages custom debug profiles for pods"
+  description: |
+    Wraps the custom debug profile subcommand to make it easier 
+    to switch between different debug profiles for pods.
+  platforms:
+    - selector:
+        matchLabels:
+          os: darwin
+          arch: amd64
+      {{addURIAndSha "https://github.com/bavarianbidi/kubectl-dpm/releases/download/{{ .TagName }}/kubectl-dpm_{{ .TagName }}_darwin_amd64.tar.gz" .TagName | indent 6 }}
+      bin: kubectl-dpm
+    - selector:
+        matchLabels:
+          os: darwin
+          arch: arm64
+      {{addURIAndSha "https://github.com/bavarianbidi/kubectl-dpm/releases/download/{{ .TagName }}/kubectl-dpm_{{ .TagName }}_darwin_arm64.tar.gz" .TagName | indent 6 }}
+      bin: kubectl-dpm
+    - selector:
+        matchLabels:
+          os: linux
+          arch: amd64
+      {{addURIAndSha "https://github.com/bavarianbidi/kubectl-dpm/releases/download/{{ .TagName }}/kubectl-dpm_{{ .TagName }}_linux_amd64.tar.gz" .TagName | indent 6 }}
+      bin: kubectl-dpm
+    - selector:
+        matchLabels:
+          os: linux
+          arch: arm64
+      bin: kubectl-dpm
+      {{addURIAndSha "https://github.com/bavarianbidi/kubectl-dpm/releases/download/{{ .TagName }}/kubectl-dpm_{{ .TagName }}_linux_arm64.tar.gz" .TagName | indent 6 }}
