@@ -18,6 +18,11 @@ require (
 )
 
 require (
+	github.com/fatih/color v1.9.0
+	github.com/rodaine/table v1.2.0
+)
+
+require (
 	github.com/Azure/go-ansiterm v0.0.0-20210617225240-d185dfc1b5a1 // indirect
 	github.com/MakeNowJust/heredoc v1.0.0 // indirect
 	github.com/chai2010/gettext-go v1.0.2 // indirect
@@ -46,6 +51,8 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
+	github.com/mattn/go-colorable v0.1.6 // indirect
+	github.com/mattn/go-isatty v0.0.12 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
