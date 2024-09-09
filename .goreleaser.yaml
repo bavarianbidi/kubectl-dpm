@@ -54,3 +54,5 @@ release:
     owner: bavarianbidi
     name: kubectl-dpm
   prerelease: auto
+  extra_files:
+    - glob: tmp/kubectl-dpm.bom.spdx
