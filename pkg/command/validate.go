@@ -16,7 +16,7 @@ func ValidateDebugProfileFile() *cobra.Command {
 		Use:   "validate",
 		Short: "validate debug profiles configuration file",
 
-		RunE: func(c *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if err := config.GenerateConfig(); err != nil {
 				return err
 			}

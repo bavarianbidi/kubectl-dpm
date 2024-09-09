@@ -26,7 +26,7 @@ func Version() *cobra.Command {
 		Use:   "version",
 		Short: "print current version",
 
-		Run: func(c *cobra.Command, args []string) {
+		Run: func(_ *cobra.Command, _ []string) {
 			fmt.Printf("Version:\t%s\n", appVersion)
 			fmt.Printf("BuildTime:\t%s\n", buildDate)
 			fmt.Printf("GitCommit:\t%s\n", gitCommit)

@@ -18,7 +18,7 @@ func List() *cobra.Command {
 		Use:   "list",
 		Short: "list all profiles",
 
-		RunE: func(c *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			if err := config.GenerateConfig(); err != nil {
 				return err
 			}

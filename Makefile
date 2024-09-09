@@ -96,9 +96,10 @@ GOVULNCHECK ?= $(LOCALBIN)/govulncheck
 KBOM ?= $(LOCALBIN)/bom
 
 ## Tool Versions
-GOLANGCI_LINT_VERSION ?= v1.55.2
+GOLANGCI_LINT_VERSION ?= v1.60.3
 GORELEASER_VERSION ?= v2.0.1
 NANCY_VERSION ?= v1.0.46
+GOVULNCHECK_VERSION ?= v1.1.3
 KBOM_VERSION ?= v0.5.1
 
 .PHONY: golangci-lint
@@ -122,8 +123,8 @@ $(NANCY): $(LOCALBIN)
 .PHONY: govulncheck
 govulncheck: $(GOVULNCHECK) ## Download govulncheck locally if necessary. If wrong version is installed, it will be overwritten.
 $(GOVULNCHECK): $(LOCALBIN)
-	test -s $(LOCALBIN)/govulncheck || \
-	GOBIN=$(LOCALBIN) go install golang.org/x/vuln/cmd/govulncheck@latest
+	test -s $(LOCALBIN)/govulncheck && $(LOCALBIN)/govulncheck -version | grep -q $(GOVULNCHECK_VERSION) || \
+	GOBIN=$(LOCALBIN) go install golang.org/x/vuln/cmd/govulncheck@$(GOVULNCHECK_VERSION)
 
 .PHONY: kbom
 kbom: $(KBOM) ## Download kbom locally if necessary. If wrong version is installed, it will be overwritten.
