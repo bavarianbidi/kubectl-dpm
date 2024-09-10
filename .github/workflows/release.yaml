@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   id-token: write
+  attestations: write
 
 jobs:
   goreleaser:
@@ -31,3 +32,16 @@ jobs:
 
       - name: Update new version in krew-index
         uses: rajatjindal/krew-release-bot@v0.0.46
+      
+      # attest archives
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: "dist/*.tar.gz"
+      
+      # attest SBOM
+      - name: Generate SBOM attestation
+        uses: actions/attest-sbom@v1
+        with:
+          subject-path: "dist/*.tar.gz"
+          sbom-path: "tmp/kubectl-dpm.bom.spdx"
