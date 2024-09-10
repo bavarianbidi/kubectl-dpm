@@ -11,6 +11,10 @@ The `dpm` is a `kubectl` plugin build to share custom debug profiles with others
 
 *Pull requests, bug reports, and all other forms of contribution are welcomed and highly encouraged!* :heart:
 
+## demo
+
+I've also done a lightning talk at KCD Munich in 2024. The recording can be viewed [here](https://youtu.be/ykHlvBW564I?si=j7_rQh3vRAVq8O28).
+
 ![demo](./kubectl-dpm.gif)
 
 ## `kubectl` custom debug profiles
