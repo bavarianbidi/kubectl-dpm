@@ -79,8 +79,13 @@ func run(args []string) error {
 		return err
 	}
 
-	// validate and complete profile
-	if err := profile.ValidateAndCompleteProfile(flagProfileName); err != nil {
+	// complete profile
+	if err := profile.CompleteProfile(flagProfileName); err != nil {
+		return err
+	}
+
+	// validate profile
+	if err := profile.ValidateProfile(flagProfileName); err != nil {
 		return err
 	}
 
@@ -112,19 +117,35 @@ func run(args []string) error {
 	if flagDebug {
 		fmt.Printf("Using profile: %+v\n", debugProfile)
 		fmt.Printf("kubectl path: %s\n", os.ExpandEnv(profile.Config.KubectlPath))
-		fmt.Printf("profile path: %s\n", debugProfile.CustomProfileFile)
-		fmt.Printf("profile path resolved: %s\n", os.ExpandEnv(debugProfile.CustomProfileFile))
+		fmt.Printf("profile path: %s\n", debugProfile.Profile)
+		fmt.Printf("profile path resolved: %s\n", os.ExpandEnv(debugProfile.Profile))
 	}
 
-	// nolint:gosec
-	debugCommand := exec.Command(
-		os.ExpandEnv(profile.Config.KubectlPath),
-		"debug",
-		"--namespace", namespace,
-		"--custom", os.ExpandEnv(debugProfile.CustomProfileFile),
-		"--image", debugProfile.Image, targetContainer,
-		"-it",
-	)
+	var debugCommand *exec.Cmd
+
+	switch {
+	case debugProfile.IsBuiltInProfile():
+		// nolint:gosec
+		debugCommand = exec.Command(
+			os.ExpandEnv(profile.Config.KubectlPath),
+			"debug",
+			"--namespace", namespace,
+			"--profile", debugProfile.Profile,
+			"--image", debugProfile.Image, targetContainer,
+			"-it",
+		)
+	default:
+		// nolint:gosec
+		debugCommand = exec.Command(
+			os.ExpandEnv(profile.Config.KubectlPath),
+			"debug",
+			"--namespace", namespace,
+			"--custom", os.ExpandEnv(debugProfile.Profile),
+			"--image", debugProfile.Image, targetContainer,
+			"-it",
+		)
+	}
+
 	debugCommand.Env = os.Environ()
 	debugCommand.Env = append(debugCommand.Env, string(cmdutil.DebugCustomProfile)+"=true")
 

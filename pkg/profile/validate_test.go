@@ -66,36 +66,46 @@ func TestValidateAllProfiles(t *testing.T) {
 			config: CustomDebugProfile{
 				Profiles: []Profile{
 					{
-						ProfileName:       "profile1",
-						CustomProfileFile: "test_data/profile1.json",
-						Image:             "busybox",
-						Namespace:         "default",
-						ImagePullPolicy:   "Always",
+						ProfileName:     "profile1",
+						Profile:         "test_data/profile1.json",
+						Image:           "busybox",
+						Namespace:       "default",
+						ImagePullPolicy: "Always",
 					},
 					{
-						ProfileName:       "profile2",
-						CustomProfileFile: "test_data/profile2.json",
-						Image:             "busybox",
+						ProfileName: "profile2",
+						Profile:     "test_data/profile2.json",
+						Image:       "busybox",
 					},
 					{
-						ProfileName:       "profile2",
-						CustomProfileFile: "test_data/profile2.json",
+						ProfileName: "profile2",
+						Profile:     "test_data/profile2.json",
+					},
+					{
+						ProfileName:    "profile3",
+						Profile:        "netadmin",
+						builtInProfile: true,
 					},
 				},
 			},
 			wantedConfig: CustomDebugProfile{
 				Profiles: []Profile{
 					{
-						ProfileName:       "profile1",
-						CustomProfileFile: "test_data/profile1.json",
-						Image:             "busybox",
-						Namespace:         "default",
-						ImagePullPolicy:   "Always",
+						ProfileName:     "profile1",
+						Profile:         "test_data/profile1.json",
+						Image:           "busybox",
+						Namespace:       "default",
+						ImagePullPolicy: "Always",
 					},
 					{
-						ProfileName:       "profile2",
-						CustomProfileFile: "test_data/profile2.json",
-						Image:             "busybox",
+						ProfileName: "profile2",
+						Profile:     "test_data/profile2.json",
+						Image:       "busybox",
+					},
+					{
+						ProfileName:    "profile3",
+						Profile:        "netadmin",
+						builtInProfile: true,
 					},
 				},
 			},
@@ -105,11 +115,11 @@ func TestValidateAllProfiles(t *testing.T) {
 			config: CustomDebugProfile{
 				Profiles: []Profile{
 					{
-						ProfileName:       "profile1",
-						CustomProfileFile: "test_data/profile1.json",
-						Image:             "busybox",
-						Namespace:         "default",
-						ImagePullPolicy:   "Always",
+						ProfileName:     "profile1",
+						Profile:         "test_data/profile1.json",
+						Image:           "busybox",
+						Namespace:       "default",
+						ImagePullPolicy: "Always",
 					},
 					{
 						ProfileName: "profile2",
@@ -123,14 +133,34 @@ func TestValidateAllProfiles(t *testing.T) {
 			config: CustomDebugProfile{
 				Profiles: []Profile{
 					{
-						ProfileName:       "profile1",
-						CustomProfileFile: "test_data/profile1.json",
-						Image:             "busybox",
-						Namespace:         "default",
-						ImagePullPolicy:   "Always",
+						ProfileName:     "profile1",
+						Profile:         "test_data/profile1.json",
+						Image:           "busybox",
+						Namespace:       "default",
+						ImagePullPolicy: "Always",
 					},
 					{
-						CustomProfileFile: "test_data/profile2.json",
+						Profile: "test_data/profile2.json",
+					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "invalid built in profile with missing profile name",
+			config: CustomDebugProfile{
+				Profiles: []Profile{
+					{
+						ProfileName:     "profile1",
+						Profile:         "test_data/profile1.json",
+						Image:           "busybox",
+						Namespace:       "default",
+						ImagePullPolicy: "Always",
+					},
+					{
+						ProfileName:    "profile2",
+						Profile:        "networkadministrator",
+						builtInProfile: true,
 					},
 				},
 			},
@@ -164,21 +194,21 @@ func TestCompleteProfile(t *testing.T) {
 			wantedConfig: CustomDebugProfile{
 				Profiles: []Profile{
 					{
-						ProfileName:       "profile1",
-						CustomProfileFile: "profile1.yaml",
-						Image:             "busybox",
-						Namespace:         "default",
-						ImagePullPolicy:   "Always",
+						ProfileName:     "profile1",
+						Profile:         "test_data/profile1.json",
+						Image:           "busybox",
+						Namespace:       "default",
+						ImagePullPolicy: "Always",
 					},
 					{
-						ProfileName:       "profile2",
-						CustomProfileFile: "profile2.yaml",
-						Image:             "busybox",
-						Namespace:         "kube-system",
+						ProfileName: "profile2",
+						Profile:     "test_data/profile2.json",
+						Image:       "busybox",
+						Namespace:   "kube-system",
 					},
 					{
-						ProfileName:       "profile3",
-						CustomProfileFile: "profile3.yaml",
+						ProfileName: "profile3",
+						Profile:     "test_data/profile3.json",
 					},
 				},
 			},
@@ -189,22 +219,22 @@ func TestCompleteProfile(t *testing.T) {
 			wantedConfig: CustomDebugProfile{
 				Profiles: []Profile{
 					{
-						ProfileName:       "profile1",
-						CustomProfileFile: "profile1.yaml",
-						Image:             "busybox",
-						Namespace:         "default",
-						ImagePullPolicy:   "Always",
+						ProfileName:     "profile1",
+						Profile:         "test_data/profile1.json",
+						Image:           "busybox",
+						Namespace:       "default",
+						ImagePullPolicy: "Always",
 					},
 					{
-						ProfileName:       "profile2",
-						CustomProfileFile: "profile2.yaml",
-						Image:             "busybox",
-						Namespace:         "kube-system",
-						ImagePullPolicy:   "IfNotPresent",
+						ProfileName:     "profile2",
+						Profile:         "test_data/profile2.json",
+						Image:           "busybox",
+						Namespace:       "kube-system",
+						ImagePullPolicy: "IfNotPresent",
 					},
 					{
-						ProfileName:       "profile3",
-						CustomProfileFile: "profile3.yaml",
+						ProfileName: "profile3",
+						Profile:     "test_data/profile3.json",
 					},
 				},
 			},
@@ -215,22 +245,22 @@ func TestCompleteProfile(t *testing.T) {
 			wantedConfig: CustomDebugProfile{
 				Profiles: []Profile{
 					{
-						ProfileName:       "profile1",
-						CustomProfileFile: "profile1.yaml",
-						Image:             "busybox",
-						Namespace:         "default",
-						ImagePullPolicy:   "Always",
+						ProfileName:     "profile1",
+						Profile:         "test_data/profile1.json",
+						Image:           "busybox",
+						Namespace:       "default",
+						ImagePullPolicy: "Always",
 					},
 					{
-						ProfileName:       "profile2",
-						CustomProfileFile: "profile2.yaml",
-						Image:             "busybox",
-						Namespace:         "kube-system",
+						ProfileName: "profile2",
+						Profile:     "test_data/profile2.json",
+						Image:       "busybox",
+						Namespace:   "kube-system",
 					},
 					{
-						ProfileName:       "profile3",
-						CustomProfileFile: "profile3.yaml",
-						ImagePullPolicy:   "IfNotPresent",
+						ProfileName:     "profile3",
+						Profile:         "test_data/profile3.json",
+						ImagePullPolicy: "IfNotPresent",
 					},
 				},
 			},
@@ -241,25 +271,28 @@ func TestCompleteProfile(t *testing.T) {
 		Config = CustomDebugProfile{
 			Profiles: []Profile{
 				{
-					ProfileName:       "profile1",
-					CustomProfileFile: "profile1.yaml",
-					Image:             "busybox",
-					Namespace:         "default",
-					ImagePullPolicy:   "Always",
+					ProfileName:     "profile1",
+					Profile:         "test_data/profile1.json",
+					Image:           "busybox",
+					Namespace:       "default",
+					ImagePullPolicy: "Always",
 				},
 				{
-					ProfileName:       "profile2",
-					CustomProfileFile: "profile2.yaml",
-					Image:             "busybox",
-					Namespace:         "kube-system",
+					ProfileName: "profile2",
+					Profile:     "test_data/profile2.json",
+					Image:       "busybox",
+					Namespace:   "kube-system",
 				},
 				{
-					ProfileName:       "profile3",
-					CustomProfileFile: "profile3.yaml",
+					ProfileName: "profile3",
+					Profile:     "test_data/profile3.json",
 				},
 			},
 		}
 		t.Run(tt.name, func(t *testing.T) {
+			if err := ValidateProfile(tt.profileName); (err != nil) != tt.wantErr {
+				t.Errorf("ValidateProfile() error = %v, wantErr %v", err, tt.wantErr)
+			}
 			if err := CompleteProfile(tt.profileName); (err != nil) != tt.wantErr {
 				t.Errorf("CompleteProfile() error = %v, wantErr %v", err, tt.wantErr)
 			}

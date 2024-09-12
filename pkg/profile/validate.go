@@ -12,6 +12,7 @@ import (
 	"strings"
 
 	corev1 "k8s.io/api/core/v1"
+	kubectldebug "k8s.io/kubectl/pkg/cmd/debug"
 )
 
 func ValidateDebugProfileFile() error {
@@ -57,7 +58,7 @@ func ValidateAllProfiles() error {
 
 	compactProfiles := slices.CompactFunc(Config.Profiles, func(a, b Profile) bool {
 		if strings.EqualFold(a.ProfileName, b.ProfileName) {
-			log.Printf("duplicate profile name %s found - keep the one with profile file %s\n", a.ProfileName, a.CustomProfileFile)
+			log.Printf("duplicate profile name %s found - keep the one with profile file %s\n", a.ProfileName, a.Profile)
 			return true
 		}
 		return false
@@ -69,9 +70,9 @@ func ValidateAllProfiles() error {
 	for _, p := range Config.Profiles {
 		switch {
 		case p.ProfileName == "":
-			return fmt.Errorf("profile file %s is missing a profile name", p.CustomProfileFile)
-		case p.CustomProfileFile == "":
-			return fmt.Errorf("profile name %s is missing a profile file", p.ProfileName)
+			return fmt.Errorf("profile %s is missing a custom profile name", p.Profile)
+		case p.Profile == "":
+			return fmt.Errorf("profile name %s is either missing a profile file or the name of a built-in profile", p.ProfileName)
 		}
 
 		if err := ValidateProfile(p.ProfileName); err != nil {
@@ -87,8 +88,29 @@ func ValidateProfile(profileName string) error {
 		func(c Profile) bool { return c.ProfileName == profileName },
 	)
 
-	if err := validatePodSpec(Config.Profiles[idx].CustomProfileFile); err != nil {
-		return err
+	switch Config.Profiles[idx].Profile {
+	case kubectldebug.ProfileLegacy:
+		Config.Profiles[idx].SetBuiltInProfile(true)
+		return nil
+	case kubectldebug.ProfileGeneral:
+		Config.Profiles[idx].SetBuiltInProfile(true)
+		return nil
+	case kubectldebug.ProfileBaseline:
+		Config.Profiles[idx].SetBuiltInProfile(true)
+		return nil
+	case kubectldebug.ProfileRestricted:
+		Config.Profiles[idx].SetBuiltInProfile(true)
+		return nil
+	case kubectldebug.ProfileNetadmin:
+		Config.Profiles[idx].SetBuiltInProfile(true)
+		return nil
+	case kubectldebug.ProfileSysadmin:
+		Config.Profiles[idx].SetBuiltInProfile(true)
+		return nil
+	default:
+		if err := validatePodSpec(Config.Profiles[idx].Profile); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -106,17 +128,6 @@ func validatePodSpec(podSpec string) error {
 		return err
 	}
 
-	return nil
-}
-
-func ValidateAndCompleteProfile(profileName string) error {
-	if err := CompleteProfile(profileName); err != nil {
-		return err
-	}
-
-	if err := ValidateProfile(profileName); err != nil {
-		return err
-	}
 	return nil
 }
 

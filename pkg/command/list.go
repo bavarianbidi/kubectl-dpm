@@ -56,11 +56,11 @@ func generateListOutput() error {
 			matchLabels += fmt.Sprintf("%s=%s, ", label, value)
 		}
 		tbl.AddRow(
-			p.ProfileName,       // Name
-			p.CustomProfileFile, // Profile
-			p.Image,             // Image
-			p.Namespace,         // Namespace
-			matchLabels,         // MatchLabels
+			p.ProfileName, // Name
+			p.Profile,     // Profile
+			p.Image,       // Image
+			p.Namespace,   // Namespace
+			matchLabels,   // MatchLabels
 		)
 	}
 
