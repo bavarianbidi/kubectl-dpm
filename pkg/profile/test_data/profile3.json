@@ -1,0 +1,8 @@
+{
+    "env": [
+        {
+            "name": "APP_ENV",
+            "value": "test"
+        }
+    ]
+}
