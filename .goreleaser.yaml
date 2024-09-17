@@ -24,8 +24,6 @@ archives:
   - id: "tar ball"
     format: tar.gz
     name_template: "{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}"
-  - id: "binary"
-    format: binary
 
 checksum:
   name_template: "checksums.txt"
