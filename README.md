@@ -74,7 +74,7 @@ profiles:
     profile: <PATH_TO_PROFILE>
 ```
 
-The `profile` field is a path to a json file which contains the `pod.Spec` of the debug container.
+The `profile` field could be either the path to a json file which contains the `pod.Spec` of the debug container or one of the built-in profiles from `kubectl` itself
 
 ```json
 {
@@ -94,6 +94,18 @@ With the above configuration, the following command can be executed:
 kubectl dpm run --profile=<PROFILE_NAME> --config=<DPM_CONFIG_FILE> --image=alpine/k8s:1.29.0 --namespace=<NAMESPACE> <POD_NAME>
 ```
 
+### minimal configuration with built-in profile
+
+As a minimal configuration with a built-in profile, the following fields are needed:
+
+```yaml
+profiles:
+  - name: <PROFILE_NAME>
+    profile: <legacy|general|baseline|restricted|netadmin|sysadmin>
+```
+
+The usage is the same as with the minimal configuration.
+
 ### full configuration
 
 The full configuration file looks like this:
@@ -101,7 +113,7 @@ The full configuration file looks like this:
 ```yaml
 profiles:
   - name: <PROFILE_NAME>
-    profile: <PATH_TO_PROFILE>
+    profile: <PATH_TO_PROFILE|BUILT_IN_DEBUG_PROFILE>
     image: <DEBUG_CONTAINER_IMAGE>
     namespace: <NAMESPACE>
     matchLabels:
@@ -111,7 +123,7 @@ profiles:
 With the above configuration, the following command can be executed:
 
 ```bash
-kubectl dpm run --profile=<PROFILE_NAME> --config=<DPM_CONFIG_FILE>
+kubectl dpm run -p <PROFILE_NAME>
 ```
 
 `dpm` will use the defined `namespace` and `image` to generate the ephemeral debug container.
@@ -130,9 +142,9 @@ As standalone binary, the `kubectlPath` value must be defined.
 
 The `dpm` has the following flags:
 
-* `--profile` - the name of the profile to use
-* `--config` - the path to the configuration file
-* `--image` - the image of the debug container
+* `-p|--profile` - the name of the profile to use
+* `-c|--config` - the path to the configuration file
+* `-i|--image` - the image of the debug container
 
 As we also register the generic `kubectl` flags, the following _relevant_  flags (IMHO) are also available:
 
