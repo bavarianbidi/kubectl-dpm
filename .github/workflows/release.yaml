@@ -41,7 +41,7 @@ jobs:
       
       # attest SBOM
       - name: Generate SBOM attestation
-        uses: actions/attest-sbom@v1
+        uses: actions/attest-sbom@v2
         with:
           subject-path: "dist/*.tar.gz"
           sbom-path: "tmp/kubectl-dpm.bom.spdx"
