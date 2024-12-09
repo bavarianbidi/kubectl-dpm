@@ -19,9 +19,10 @@ func main() {
 	// create root command
 	root := command.Root()
 
-	root.PersistentFlags().StringVar(
+	root.PersistentFlags().StringVarP(
 		&config.ConfigurationFile,
 		"config",
+		"c",
 		os.Getenv("HOME")+"/.kube-dpm/debug-profiles.yaml",
 		"config path",
 	)
