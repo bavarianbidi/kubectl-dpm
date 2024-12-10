@@ -116,6 +116,64 @@ func ValidateProfile(profileName string) error {
 	return nil
 }
 
+func InteractiveProfiles() []Profile {
+	// sort profiles by name
+	SortProfiles()
+
+	compactProfiles := slices.CompactFunc(Config.Profiles, func(a, b Profile) bool {
+		if strings.EqualFold(a.ProfileName, b.ProfileName) {
+			log.Printf("duplicate profile name %s found - keep the one with profile file %s\n", a.ProfileName, a.Profile)
+			return true
+		}
+		return false
+	})
+
+	// update Config.Profiles with compacted profiles
+	Config.Profiles = compactProfiles
+
+	//TODO: check above code to move out from here
+
+	var interactiveProfiles []Profile
+
+	for _, p := range Config.Profiles {
+		if !namespaceIsMissing(p.ProfileName) &&
+			!labelSelectorIsMissing(p.ProfileName) &&
+			!imageIsMissing(p.ProfileName) {
+
+			interactiveProfiles = append(interactiveProfiles, p)
+		}
+	}
+
+	return interactiveProfiles
+
+}
+
+// TODO:
+// create a func to get the idx of the profile by name
+func namespaceIsMissing(profileName string) bool {
+	idx := slices.IndexFunc(Config.Profiles,
+		func(c Profile) bool { return c.ProfileName == profileName },
+	)
+
+	return Config.Profiles[idx].Namespace == ""
+}
+
+func labelSelectorIsMissing(profileName string) bool {
+	idx := slices.IndexFunc(Config.Profiles,
+		func(c Profile) bool { return c.ProfileName == profileName },
+	)
+
+	return Config.Profiles[idx].MatchLabels == nil
+}
+
+func imageIsMissing(profileName string) bool {
+	idx := slices.IndexFunc(Config.Profiles,
+		func(c Profile) bool { return c.ProfileName == profileName },
+	)
+
+	return Config.Profiles[idx].Image == ""
+}
+
 func validatePodSpec(podSpec string) error {
 	podSpecByte, err := os.ReadFile(os.ExpandEnv(podSpec))
 	if err != nil {

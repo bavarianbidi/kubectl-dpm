@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"slices"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -34,14 +35,21 @@ func NewCmdDebugProfile(_ genericiooptions.IOStreams) *cobra.Command {
 		Long:  "create an ephemeral debug container in a pod by using the kubectl debug implementation and a custom profile",
 
 		RunE: func(c *cobra.Command, args []string) error {
-			// if no args are given, print help
-			if c.Flags().NFlag() == 0 {
-				c.Help()
-				os.Exit(0)
-			}
 
 			if err := config.GenerateConfig(); err != nil {
 				return err
+			}
+
+			// if no args are given, start interactive mode
+			if c.Flags().NFlag() == 0 {
+				//...
+				p := tea.NewProgram(initialModel())
+				if _, err := p.Run(); err != nil {
+					fmt.Printf("Alas, there's been an error: %v", err)
+					os.Exit(1)
+				}
+				return nil
+
 			}
 
 			if err := run(args); err != nil {
@@ -69,6 +77,7 @@ func NewCmdDebugProfile(_ genericiooptions.IOStreams) *cobra.Command {
 }
 
 func run(args []string) error {
+
 	// validate kubectl path
 	if err := profile.ValidateKubectlPath(); err != nil {
 		return err
