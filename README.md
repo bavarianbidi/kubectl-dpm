@@ -139,6 +139,21 @@ This only works, if the `dpm` is run as a `kubectl` plugin.
 
 As standalone binary, the `kubectlPath` value must be defined.
 
+### style
+
+`dpm` has an interactive mode where the user can select the profile to use.
+To overwrite the default style, the `style` field can be used.
+
+```yaml
+style:
+  headerForeground: <COLOR>
+  headerBackground: <COLOR>
+  selectedForeground: <COLOR>
+  selectedBackground: <COLOR>
+```
+
+The `COLOR` value must be a valid color value either from the [ANSI color list](https://en.wikipedia.org/wiki/ANSI_escape_code#Colors) or the hex value of the color.
+
 ## flags
 
 The `dpm` has the following flags:
