@@ -3,8 +3,6 @@
 package command
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
 
 	"github.com/bavarianbidi/kubectl-dpm/pkg/config"
@@ -25,7 +23,9 @@ func ValidateDebugProfileFile() *cobra.Command {
 				return err
 			}
 
-			fmt.Printf("all profiles are valid\n")
+			if err := generateListOutput(); err != nil {
+				return err
+			}
 
 			return nil
 		},

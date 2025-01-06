@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"slices"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/spf13/cobra"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -34,14 +34,20 @@ func NewCmdDebugProfile(_ genericiooptions.IOStreams) *cobra.Command {
 		Long:  "create an ephemeral debug container in a pod by using the kubectl debug implementation and a custom profile",
 
 		RunE: func(c *cobra.Command, args []string) error {
-			// if no args are given, print help
-			if c.Flags().NFlag() == 0 {
-				c.Help()
-				os.Exit(0)
-			}
-
 			if err := config.GenerateConfig(); err != nil {
 				return err
+			}
+
+			// if no args are given, start interactive mode to select a profile
+			if c.Flags().NFlag() == 0 {
+				p := tea.NewProgram(initTeaModel())
+				if _, err := p.Run(); err != nil {
+					return fmt.Errorf("error running program: %v", err)
+				}
+
+				if flagProfileName == "" {
+					return fmt.Errorf("no profile selected - exiting")
+				}
 			}
 
 			if err := run(args); err != nil {
@@ -90,9 +96,7 @@ func run(args []string) error {
 	}
 
 	// get the index of the profile where the profile name matches
-	idx := slices.IndexFunc(profile.Config.Profiles,
-		func(c profile.Profile) bool { return c.ProfileName == flagProfileName },
-	)
+	idx := profile.GetProfileIdx(flagProfileName)
 
 	debugProfile = profile.Config.Profiles[idx]
 

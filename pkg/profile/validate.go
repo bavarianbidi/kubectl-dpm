@@ -67,11 +67,13 @@ func ValidateAllProfiles() error {
 	// update Config.Profiles with compacted profiles
 	Config.Profiles = compactProfiles
 
-	for _, p := range Config.Profiles {
+	for idx, p := range Config.Profiles {
 		switch {
 		case p.ProfileName == "":
+			Config.Profiles = slices.Delete(Config.Profiles, idx, idx)
 			return fmt.Errorf("profile %s is missing a custom profile name", p.Profile)
 		case p.Profile == "":
+			Config.Profiles = slices.Delete(Config.Profiles, idx, idx)
 			return fmt.Errorf("profile name %s is either missing a profile file or the name of a built-in profile", p.ProfileName)
 		}
 
@@ -84,9 +86,7 @@ func ValidateAllProfiles() error {
 
 // ValidateProfile validates a single profile
 func ValidateProfile(profileName string) error {
-	idx := slices.IndexFunc(Config.Profiles,
-		func(c Profile) bool { return c.ProfileName == profileName },
-	)
+	idx := GetProfileIdx(profileName)
 
 	switch Config.Profiles[idx].Profile {
 	case kubectldebug.ProfileLegacy:
@@ -109,11 +109,45 @@ func ValidateProfile(profileName string) error {
 		return nil
 	default:
 		if err := validatePodSpec(Config.Profiles[idx].Profile); err != nil {
-			return err
+			log.Printf("profile %s is invalid: %s\n", Config.Profiles[idx].Profile, err.Error())
 		}
 	}
 
 	return nil
+}
+
+// InteractiveProfiles returns all profiles that can be used from
+// the interactive mode, dpm run (without args)
+// these profiles do have all required fields set (namespace, labelSelector, image)
+func InteractiveProfiles() []Profile {
+	// sort profiles by name
+	SortProfiles()
+
+	ValidateAllProfiles()
+
+	var interactiveProfiles []Profile
+
+	for _, p := range Config.Profiles {
+		if !namespaceIsMissing(p.ProfileName) &&
+			!labelSelectorIsMissing(p.ProfileName) &&
+			!imageIsMissing(p.ProfileName) {
+			interactiveProfiles = append(interactiveProfiles, p)
+		}
+	}
+
+	return interactiveProfiles
+}
+
+func namespaceIsMissing(profileName string) bool {
+	return Config.Profiles[GetProfileIdx(profileName)].Namespace == ""
+}
+
+func labelSelectorIsMissing(profileName string) bool {
+	return Config.Profiles[GetProfileIdx(profileName)].MatchLabels == nil
+}
+
+func imageIsMissing(profileName string) bool {
+	return Config.Profiles[GetProfileIdx(profileName)].Image == ""
 }
 
 func validatePodSpec(podSpec string) error {
@@ -134,13 +168,27 @@ func validatePodSpec(podSpec string) error {
 // CompleteProfile completes a profile with default values
 func CompleteProfile(profileName string) error {
 	// get the index of the profile where the profile name matches
-	idx := slices.IndexFunc(Config.Profiles,
-		func(c Profile) bool { return c.ProfileName == profileName },
-	)
+	idx := GetProfileIdx(profileName)
 
 	if Config.Profiles[idx].ImagePullPolicy == "" {
 		Config.Profiles[idx].ImagePullPolicy = corev1.PullIfNotPresent
 	}
 
 	return nil
+}
+
+// CompleteStyle completes the style with default values
+func CompleteStyle() {
+	if Config.Style.HeaderForegroundColor == "" {
+		Config.Style.HeaderForegroundColor = "#ffffaf"
+	}
+	if Config.Style.HeaderBackgroundColor == "" {
+		Config.Style.HeaderBackgroundColor = "#5f00ff"
+	}
+	if Config.Style.SelectedForegroundColor == "" {
+		Config.Style.SelectedForegroundColor = "#ffffaf"
+	}
+	if Config.Style.SelectedBackgroundColor == "" {
+		Config.Style.SelectedBackgroundColor = "#5f00ff"
+	}
 }

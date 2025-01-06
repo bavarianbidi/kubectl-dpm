@@ -158,8 +158,7 @@ func TestValidateAllProfiles(t *testing.T) {
 						ImagePullPolicy: "Always",
 					},
 					{
-						ProfileName:    "profile2",
-						Profile:        "networkadministrator",
+						Profile:        "netadmin",
 						builtInProfile: true,
 					},
 				},

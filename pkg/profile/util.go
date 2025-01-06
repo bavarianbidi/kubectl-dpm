@@ -14,3 +14,8 @@ func SortProfiles() {
 		return cmp.Compare(strings.ToLower(a.ProfileName), strings.ToLower(b.ProfileName))
 	})
 }
+
+func GetProfileIdx(profileName string) int {
+	// get the index of the profile where the profile name matches
+	return slices.IndexFunc(Config.Profiles, func(c Profile) bool { return c.ProfileName == profileName })
+}

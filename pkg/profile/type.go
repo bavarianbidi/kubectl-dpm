@@ -19,9 +19,17 @@ type Profile struct {
 	builtInProfile bool
 }
 
+type Style struct {
+	HeaderForegroundColor   string `koanf:"headerForegroundColor" yaml:"headerForegroundColor"`
+	HeaderBackgroundColor   string `koanf:"headerBackgroundColor" yaml:"headerBackgroundColor"`
+	SelectedForegroundColor string `koanf:"selectedForegroundColor" yaml:"selectedForegroundColor"`
+	SelectedBackgroundColor string `koanf:"selectedBackgroundColor" yaml:"selectedBackgroundColor"`
+}
+
 type CustomDebugProfile struct {
 	Profiles    []Profile `koanf:"profiles" yaml:"profiles"`
 	KubectlPath string    `koanf:"kubectlPath" yaml:"kubectlPath"`
+	Style       Style     `koanf:"style" yaml:"style"`
 }
 
 // global Profile configuration
