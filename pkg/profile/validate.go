@@ -71,10 +71,10 @@ func ValidateAllProfiles() error {
 		switch {
 		case p.ProfileName == "":
 			Config.Profiles = slices.Delete(Config.Profiles, idx, idx)
-			// return fmt.Errorf("profile %s is missing a custom profile name", p.Profile)
+			return fmt.Errorf("profile %s is missing a custom profile name", p.Profile)
 		case p.Profile == "":
 			Config.Profiles = slices.Delete(Config.Profiles, idx, idx)
-			// return fmt.Errorf("profile name %s is either missing a profile file or the name of a built-in profile", p.ProfileName)
+			return fmt.Errorf("profile name %s is either missing a profile file or the name of a built-in profile", p.ProfileName)
 		}
 
 		if err := ValidateProfile(p.ProfileName); err != nil {
