@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: MIT
 
 cover.out
+coverage.txt
 bin/
 tmp/
 .vscode/
