@@ -1,0 +1,17 @@
+profiles:
+  - name: "profile1"
+    profile: "test_data/profile1.json"
+    image: "busybox"
+    namespace: "default"
+    imagePullPolicy: "Always"
+  - name: "profile2"
+    profile: "test_data/profile2.json"
+    image: "busybox"
+  - name: "profile3"
+    profile: "netadmin"
+  - name: profile4
+    profile: netadmin
+    image: nicolaka/netshoot:v0.13
+    namespace: application
+    matchLabels:
+      app.kubernetes.io/instance: app
