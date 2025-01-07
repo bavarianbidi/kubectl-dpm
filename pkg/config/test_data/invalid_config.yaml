@@ -1,0 +1,7 @@
+# yaml is not valid to be parsed
+prof: # should be profile - see working test_config.yaml
+  - name: "profile1"
+    profile: "test_data/profile1.json"
+    image: "busybox"
+    namespace: "default"
+    imagePullPolicy: "Always"
