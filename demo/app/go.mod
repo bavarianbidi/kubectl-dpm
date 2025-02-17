@@ -2,7 +2,7 @@
 
 module github.com/bavarianbidi/kubectl-dpm/demo/app
 
-go 1.23.6
+go 1.24.0
 
 require github.com/prometheus/client_golang v1.19.1
 
