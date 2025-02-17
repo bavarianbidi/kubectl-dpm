@@ -6,6 +6,7 @@
 [![codecov](https://codecov.io/github/bavarianbidi/kubectl-dpm/graph/badge.svg?token=R2CAFHM1A3)](https://codecov.io/github/bavarianbidi/kubectl-dpm)
 [![build](https://github.com/bavarianbidi/kubectl-dpm/actions/workflows/build.yaml/badge.svg)](https://github.com/bavarianbidi/kubectl-dpm/actions/workflows/build.yaml)
 [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/bavarianbidi/kubectl-dpm/badge)](https://scorecard.dev/viewer/?uri=github.com/bavarianbidi/kubectl-dpm)
+[![OpenSSF Best Practices](https://www.bestpractices.dev/projects/9484/badge)](https://www.bestpractices.dev/projects/9484)
 
 # `dpm` the `kubectl debug-profile-manager`
 
