@@ -68,77 +68,26 @@ run: fmt vet ## Run a controller from your host.
 ##@ SBOM
 
 .PHONY: sbom
-sbom: kbom sbom-generate
+sbom: sbom-generate
 
 .PHONY: sbom-generate
-sbom-generate: kbom ## Generate SBOM
+sbom-generate: ## Generate SBOM
 	mkdir -p tmp
-	$(KBOM) generate --output tmp/kubectl-dpm.bom.spdx --format json .
+	go tool bom generate --output tmp/kubectl-dpm.bom.spdx --format json .
 
 ##@ Release
 
 .PHONY: release
-release: sbom-generate goreleaser ## Create a new release
-	$(GORELEASER) release --clean
-
-##@ Build Dependencies
-
-## Location to install dependencies to
-LOCALBIN ?= $(shell pwd)/bin
-$(LOCALBIN):
-	mkdir -p $(LOCALBIN)
-
-## Tool Binaries
-GOLANGCI_LINT ?= $(LOCALBIN)/golangci-lint
-GORELEASER ?= $(LOCALBIN)/goreleaser
-NANCY ?= $(LOCALBIN)/nancy
-GOVULNCHECK ?= $(LOCALBIN)/govulncheck
-KBOM ?= $(LOCALBIN)/bom
-
-## Tool Versions
-GOLANGCI_LINT_VERSION ?= v1.64.5
-GORELEASER_VERSION ?= v2.0.1
-NANCY_VERSION ?= v1.0.46
-GOVULNCHECK_VERSION ?= v1.1.3
-KBOM_VERSION ?= v0.6.0
-
-.PHONY: golangci-lint
-golangci-lint: $(GOLANGCI_LINT) ## Download golangci-lint locally if necessary. If wrong version is installed, it will be overwritten.
-$(GOLANGCI_LINT): $(LOCALBIN)
-	test -s $(LOCALBIN)/golangci-lint && $(LOCALBIN)/golangci-lint --version | grep -q $(GOLANGCI_LINT_VERSION) || \
-	GOBIN=$(LOCALBIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANGCI_LINT_VERSION)
-
-.PHONY: goreleaser
-goreleaser: $(GORELEASER) ## Download goreleaser locally if necessary. If wrong version is installed, it will be overwritten.
-$(GORELEASER): $(LOCALBIN)
-	test -s $(LOCALBIN)/goreleaser && $(LOCALBIN)/goreleaser --version | grep -q $(GORELEASER_VERSION) || \
-	GOBIN=$(LOCALBIN) go install github.com/goreleaser/goreleaser/v2@$(GORELEASER_VERSION)
-
-.PHONY: nancy
-nancy: $(NANCY) ## Download nancy locally if necessary. If wrong version is installed, it will be overwritten.
-$(NANCY): $(LOCALBIN)
-	test -s $(LOCALBIN)/nancy && $(LOCALBIN)/nancy --version | grep -q $(NANCY_VERSION) || \
-	GOBIN=$(LOCALBIN) go install github.com/sonatype-nexus-community/nancy@$(NANCY_VERSION)
-
-.PHONY: govulncheck
-govulncheck: $(GOVULNCHECK) ## Download govulncheck locally if necessary. If wrong version is installed, it will be overwritten.
-$(GOVULNCHECK): $(LOCALBIN)
-	test -s $(LOCALBIN)/govulncheck && $(LOCALBIN)/govulncheck -version | grep -q $(GOVULNCHECK_VERSION) || \
-	GOBIN=$(LOCALBIN) go install golang.org/x/vuln/cmd/govulncheck@$(GOVULNCHECK_VERSION)
-
-.PHONY: kbom
-kbom: $(KBOM) ## Download kbom locally if necessary. If wrong version is installed, it will be overwritten.
-$(KBOM): $(LOCALBIN)
-	test -s $(LOCALBIN)/bom && $(LOCALBIN)/bom version | grep -q $(KBOM_VERSION) || \
-	GOBIN=$(LOCALBIN) go install sigs.k8s.io/bom/cmd/bom@$(KBOM_VERSION)
+release: sbom-generate ## Create a new release
+	go tool goreleaser release --clean
 
 ##@ Lint / Verify
 .PHONY: lint
-lint: $(GOLANGCI_LINT) ## Run linting.
-	$(GOLANGCI_LINT) run -v $(GOLANGCI_LINT_EXTRA_ARGS)
+lint: ## Run linting.
+	go tool golangci-lint run -v $(GOLANGCI_LINT_EXTRA_ARGS)
 
 .PHONY: lint-fix
-lint-fix: $(GOLANGCI_LINT) ## Lint the codebase and run auto-fixers if supported by the linte
+lint-fix: ## Lint the codebase and run auto-fixers if supported by the linte
 	GOLANGCI_LINT_EXTRA_ARGS=--fix $(MAKE) lint
 
 ALL_VERIFY_CHECKS = security license
@@ -155,9 +104,9 @@ verify-security: govulncheck-scan nancy-scan ## Verify security by running govul
 	@echo "Security checks passed"
 
 .PHONY: govulncheck-scan
-govulncheck-scan: govulncheck ## Perform govulncheck scan
-	$(GOVULNCHECK) ./...
+govulncheck-scan: ## Perform govulncheck scan
+	go tool govulncheck ./...
 
 .PHONY: nancy-scan
-nancy-scan: nancy ## Perform nancy scan
-	go list -json -deps ./... | $(NANCY) sleuth
+nancy-scan: ## Perform nancy scan
+	go list -json -deps ./... | go tool nancy sleuth
