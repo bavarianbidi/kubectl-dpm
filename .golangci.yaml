@@ -1,15 +1,11 @@
 # SPDX-License-Identifier: MIT
+version: "2"
 linters:
-  disable-all: true
-  fast: false
+  default: none
   enable:
-    - gci
     - goconst
     - gocritic
     - gocyclo
-    - gofmt
-    - gofumpt
-    - goimports
     - godox
     - govet
     - gosec
@@ -30,34 +26,40 @@ linters:
     - wastedassign
     - whitespace
 
-linters-settings:
-  gci:
-    sections:
-      - standard
-      - default
-      - prefix(github.com/bavarianbidi/kubectl-dpm)
+  settings:
+    importas:
+      no-unaliased: false
+      alias:
+        - pkg: k8s.io/api/core/v1
+          alias: corev1
+        - pkg: k8s.io/apimachinery/pkg/apis/meta/v1
+          alias: metav1
+        - pkg: k8s.io/client-go/kubernetes/typed/core/v1
+          alias: corev1client
+        - pkg: k8s.io/client-go/tools/watch
+          alias: watchtools
+        - pkg: k8s.io/kubectl/pkg/cmd/debug
+          alias: kubectldebug
+        - pkg: k8s.io/kubectl/pkg/cmd/util
+          alias: cmdutil
+    loggercheck:
+      klog: true
+      zap: false
+      require-string-key: true
+      no-printf-like: true
 
-  goimports:
-    local-prefixes: github.com/bavarianbidi/kubectl-dpm
-
-  importas:
-    no-unaliased: false
-    alias:
-      - pkg: k8s.io/api/core/v1
-        alias: corev1
-      - pkg: k8s.io/apimachinery/pkg/apis/meta/v1
-        alias: metav1
-      - pkg: k8s.io/client-go/kubernetes/typed/core/v1
-        alias: corev1client
-      - pkg: k8s.io/client-go/tools/watch
-        alias: watchtools
-      - pkg: k8s.io/kubectl/pkg/cmd/debug
-        alias: kubectldebug
-      - pkg: k8s.io/kubectl/pkg/cmd/util
-        alias: cmdutil
-
-  loggercheck:
-    klog: true
-    zap: false
-    require-string-key: true
-    no-printf-like: true
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - goimports
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/bavarianbidi/kubectl-dpm)
+    goimports:
+      local-prefixes:
+        - github.com/bavarianbidi/kubectl-dpm
