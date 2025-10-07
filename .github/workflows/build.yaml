@@ -25,6 +25,9 @@ jobs:
 
       - name: make verify
         run: make verify
+        env:
+          OSS_TOKEN: ${{ secrets.OSS_TOKEN }}
+          OSS_USERNAME: ${{ secrets.OSS_USERNAME }}
 
       - name: make lint
         run: GOLANGCI_LINT_EXTRA_ARGS=--timeout=1h make lint

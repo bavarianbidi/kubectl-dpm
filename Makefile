@@ -109,4 +109,4 @@ govulncheck-scan: ## Perform govulncheck scan
 
 .PHONY: nancy-scan
 nancy-scan: ## Perform nancy scan
-	go list -json -deps ./... | go tool nancy sleuth
+	@go list -json -deps ./... | go tool nancy sleuth --token=$(OSS_TOKEN) --username=$(OSS_USERNAME)
