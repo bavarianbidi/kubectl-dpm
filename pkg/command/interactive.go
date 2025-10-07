@@ -16,9 +16,12 @@ type model struct {
 }
 
 // initTeaModel initializes the model for the interactive mode
-func initTeaModel() model {
+func initTeaModel() (model, error) {
 	// generate a list of profiles which work in interactive mode
-	interactiveProfiles := profile.InteractiveProfiles()
+	interactiveProfiles, err := profile.InteractiveProfiles()
+	if err != nil {
+		return model{}, err
+	}
 
 	// generate the table with image, namespace and matchLabels columns
 	t := table.GenerateTable(interactiveProfiles, true)
@@ -41,7 +44,7 @@ func initTeaModel() model {
 
 	return model{
 		table: t,
-	}
+	}, nil
 }
 
 func (m model) Init() tea.Cmd {
