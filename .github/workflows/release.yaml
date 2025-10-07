@@ -6,7 +6,7 @@ on:
   push:
     # run only against tags
     tags:
-      - 'v*'
+      - "v*"
 
 permissions:
   contents: write
@@ -23,7 +23,7 @@ jobs:
       - run: git fetch --force --tags
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.24.4'
+          go-version: "1.25.1"
 
       - name: release
         run: make release
@@ -32,13 +32,13 @@ jobs:
 
       - name: Update new version in krew-index
         uses: rajatjindal/krew-release-bot@v0.0.47
-      
+
       # attest archives
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: "dist/*.tar.gz"
-      
+
       # attest SBOM
       - name: Generate SBOM attestation
         uses: actions/attest-sbom@v2

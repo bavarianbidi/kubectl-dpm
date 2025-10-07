@@ -1,2 +1,2 @@
 # SPDX-License-Identifier: MIT
-CVE-2024-8421 # pkg:golang/golang.org/x/net@v0.26.0 - from transitive dep from k8s.io
+CVE-2025-11065 # pkg:golang/github.com/mitchellh/mapstructure@v1.5.0 - no new release yet
