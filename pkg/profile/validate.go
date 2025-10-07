@@ -119,11 +119,14 @@ func ValidateProfile(profileName string) error {
 // InteractiveProfiles returns all profiles that can be used from
 // the interactive mode, dpm run (without args)
 // these profiles do have all required fields set (namespace, labelSelector, image)
-func InteractiveProfiles() []Profile {
+func InteractiveProfiles() ([]Profile, error) {
 	// sort profiles by name
 	SortProfiles()
 
-	ValidateAllProfiles()
+	err := ValidateAllProfiles()
+	if err != nil {
+		return nil, err
+	}
 
 	var interactiveProfiles []Profile
 
@@ -135,7 +138,7 @@ func InteractiveProfiles() []Profile {
 		}
 	}
 
-	return interactiveProfiles
+	return interactiveProfiles, nil
 }
 
 func namespaceIsMissing(profileName string) bool {

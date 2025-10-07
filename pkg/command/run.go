@@ -40,7 +40,11 @@ func NewCmdDebugProfile(_ genericiooptions.IOStreams) *cobra.Command {
 
 			// if no args are given, start interactive mode to select a profile
 			if c.Flags().NFlag() == 0 {
-				p := tea.NewProgram(initTeaModel())
+				model, err := initTeaModel()
+				if err != nil {
+					return err
+				}
+				p := tea.NewProgram(model)
 				if _, err := p.Run(); err != nil {
 					return fmt.Errorf("error running program: %v", err)
 				}
