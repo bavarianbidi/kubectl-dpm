@@ -155,7 +155,9 @@ func run(args []string) error {
 	}
 
 	debugCommand.Env = os.Environ()
-	debugCommand.Env = append(debugCommand.Env, string(cmdutil.DebugCustomProfile)+"=true")
+	// kubectl feature flag DebugCustomProfile got dropped in 1.34
+	// explicitly set it to true to support kubectl versions < 1.34
+	debugCommand.Env = append(debugCommand.Env, string("KUBECTL_DEBUG_CUSTOM_PROFILE=true"))
 
 	debugCommand.Stdout = os.Stdout
 	debugCommand.Stderr = os.Stderr
