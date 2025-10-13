@@ -53,7 +53,9 @@ vet: ## Run go vet against code.
 
 .PHONY: test
 test: fmt vet ## Run tests.
-	go test ./... -coverprofile coverage.txt
+	# disable coverprofile for now as of https://github.com/golang/go/issues/75031
+	# go test ./... -coverprofile coverage.txt
+	go test ./...
 
 ##@ Build
 
