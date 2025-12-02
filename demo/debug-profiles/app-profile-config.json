@@ -1,7 +1,7 @@
 {
     "volumeMounts": [
         {
-            "mountPath": "/app/config",
+            "mountPath": "/conf",
             "name": "app-config",
             "readOnly": true
         }

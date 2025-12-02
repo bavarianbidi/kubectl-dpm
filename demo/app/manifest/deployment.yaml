@@ -20,16 +20,16 @@ spec:
     spec:
       shareProcessNamespace: true
       containers:
-        - image: quay.io/bavarianbidi/demo-app:latest
-          args: ["-metric=127.0.0.1:9090", "-template=/index.tmpl"]
+        - image: localhost:5000/demo-app:latest
+          args: ["-metric=127.0.0.1:9090", "-template=/conf/index.tmpl"]
           name: webapp
           env:
             - name: SERVER_VERSION
               value: v1.0.0
             - name: SERVER_TITLE
-              value: "Conference 2024"
+              value: "KCD Suisse Romande 2024"
             - name: SERVER_MESSAGE
-              value: "Welcome to Conference 2024"
+              value: "Welcome to CERN - the home of the LHC and the place where the web was born!"
           ports:
             - name: app
               containerPort: 8080

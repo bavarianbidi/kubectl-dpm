@@ -71,7 +71,11 @@ type pageTemplateData struct {
 
 func httpHandler(w http.ResponseWriter, req *http.Request) {
 
-	tmpl := template.Must(template.ParseFiles(*templatePath))
+	template, err := template.ParseFiles(*templatePath)
+	if err != nil {
+		http.Error(w, "Very bad internal server error.", http.StatusInternalServerError)
+		return
+	}
 
 	hostname, err := os.Hostname()
 	if err != nil {
@@ -92,7 +96,7 @@ func httpHandler(w http.ResponseWriter, req *http.Request) {
 		RemoteAddress: remoteAddress,
 	}
 
-	if err = tmpl.Execute(w, data); err != nil {
+	if err = template.Execute(w, data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

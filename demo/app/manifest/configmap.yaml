@@ -13,7 +13,7 @@ data:
     <tt>
     Hostname: {{.Hostname}}</br>
     Version: {{.Version}}</br>
-    RemoteAddress: {{.RemoteAddress}}
+    RemoteAddress: {{RemoteAddress}}
     </tt>
     </p>
 

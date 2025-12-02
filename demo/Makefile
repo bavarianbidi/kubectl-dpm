@@ -28,30 +28,9 @@ help: ## Display this help.
 exec-node: ## start a shell on node level
 	kubectl debug node/kcd-control-plane -it --image=nicolaka/netshoot:v0.13
 
-.PHONY: exec-pod
-exec-pod: ## Start a shell at the pod
-	$(eval POD=$(shell kubectl get pod -l run=webapp -o=jsonpath='{.items[0].metadata.name}'))
-	kubectl exec -it $(POD) -- /bin/sh
 
 
-.PHONY: prom-port-forward
-prom-port-forward: ## Port forward Prometheus.
-	kubectl port-forward svc/prometheus-server 9090:80
 
-.PHONY: app-port-forward
-app-port-forward: ## Port forward webapp.
-	$(eval POD=$(shell kubectl get pod -l run=webapp -o=jsonpath='{.items[0].metadata.name}'))
-	kubectl port-forward $(POD) 8080
-
-.PHONY: app-metrics-port-forward
-app-metrics-port-forward: ## Port forward to webapp on metrics port
-	$(eval POD=$(shell kubectl get pod -l run=webapp -o=jsonpath='{.items[0].metadata.name}'))
-	kubectl port-forward $(POD) 9090
-
-.PHONY: debug-pod
-debug-pod: ## kubectl debug
-	$(eval POD=$(shell kubectl get pod -l run=webapp -o=jsonpath='{.items[0].metadata.name}'))
-	kubectl debug --image=nicolaka/netshoot:v0.13 $(POD) -it
 
 .PHONY: debug-pod-with-profile
 debug-pod-with-profile: ## kubectl custom profile
@@ -84,22 +63,13 @@ qr-code: ## print dpm qr code
 
 .PHONY: kind-cluster
 kind-cluster: ## Create a kind cluster.
-	kind create cluster --name kcd
+	kind-with-registry.sh
 
 .PHONY: get-kubeconfig
 get-kubeconfig: ## Export kubeconfig.
 	kind export kubeconfig --name kcd --kubeconfig /tmp/kcd.kubeconfig
 
-.PHONY: apply-prometheus
-apply-prometheus: get-kubeconfig add-community-chart ## Apply Prometheus.
-	helm upgrade prometheus prometheus-community/prometheus --install --kubeconfig /tmp/kcd.kubeconfig
-
-.PHONY: add-community-chart
-add-community-chart: ## Add community chart repository.
-	helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-	helm repo update
-
-##@ Webapp
+##@ Prepare
 
 .PHONY: apply-webapp
 apply-webapp: ## Apply webapp.
@@ -107,5 +77,55 @@ apply-webapp: ## Apply webapp.
 
 .PHONY: build-webapp
 build-webapp: ## Build webapp.
-	docker build -t quay.io/bavarianbidi/demo-app:latest app/
-	docker push quay.io/bavarianbidi/demo-app:latest
+	docker build -t localhost:5000/demo-app:latest app/
+	docker push localhost:5000/demo-app:latest
+
+.PHONY: port-forward-webapp
+port-forward-webapp: ## Port forward webapp.
+	kubectl port-forward svc/webapp 8080:8080
+
+##@ Live Demo
+
+.PHONY: 01-access-webapp
+01-access-webapp: ## Access webapp.
+	# TODO: print the http status code and then the body
+	curl http://localhost:8080
+
+.PHONY: 02-get-pod-logs
+02-get-pod-logs: ## Get the pod logs
+	$(eval POD=$(shell kubectl get pod -l run=webapp -o=jsonpath='{.items[0].metadata.name}'))
+	kubectl logs $(POD)
+
+.PHONY: 03-exec-pod
+03-exec-pod: ## Start a shell at the pod
+	$(eval POD=$(shell kubectl get pod -l run=webapp -o=jsonpath='{.items[0].metadata.name}'))
+	kubectl exec -it $(POD) -- /bin/sh
+
+.PHONY: 04-rebuild-webapp-with-alpine
+04-rebuild-webapp-with-alpine: ## Build webapp.
+	docker build -t localhost:5000/demo-app:alpine -f app/all.Dockerfile app/
+	docker push localhost:5000/demo-app:alpine
+	GRYPE_DB_AUTO_UPDATE=false grype localhost:5000/demo-app:alpine
+
+.PHONY: 05-debug-pod
+05-debug-pod: ## kubectl debug
+	$(eval POD=$(shell kubectl get pod -l run=webapp -o=jsonpath='{.items[0].metadata.name}'))
+	kubectl debug --image=nicolaka/netshoot:v0.13 $(POD) -it
+
+.PHONY: 06-run-dpm
+06-run-dpm: ## run k dpm
+	kubectl dpm run --debug --profile webapp --config debug-profiles/debug-profiles.yaml
+
+.PHONY: 06-show-kubectl-debug-command
+06-show-kubectl-debug-command: ## show k debug command with custom profile
+	$(eval POD=$(shell kubectl get pod -l run=webapp -o=jsonpath='{.items[0].metadata.name}'))
+	@echo "kubectl debug \
+	--namespace default \
+	--custom /home/comario/go/src/github.com/bavarianbidi/kubectl-dpm/demo/debug-profiles/app-profile-config.json \
+	--image nicolaka/netshoot:v0.13 \
+	$(POD) -it"
+
+
+.PHONY: 07-print-debug-profile
+07-print-debug-profile: ## print debug profile
+	@cat debug-profiles/app-profile-config.json | jq '.'

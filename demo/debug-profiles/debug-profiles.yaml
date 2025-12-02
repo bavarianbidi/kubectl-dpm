@@ -12,6 +12,3 @@ profiles:
     namespace: default
     matchLabels:
       run: webapp
-  - name: demo
-    profile: /home/comario/go/src/github.com/bavarianbidi/kubectl-dpm/demo/debug-profiles/app-profile-config.json
-    image: nicolaka/netshoot:v0.13

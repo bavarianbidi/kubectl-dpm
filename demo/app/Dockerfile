@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-FROM golang:1.24 as builder
+FROM golang:1.25 as builder
 WORKDIR /workspace
 COPY go.mod go.mod
 COPY go.sum go.sum
