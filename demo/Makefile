@@ -20,44 +20,30 @@ SHELL = /usr/bin/env bash -o pipefail
 
 .PHONY: help
 help: ## Display this help.
-	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-30s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 ##@ debug prometheus
-
-.PHONY: exec-node
-exec-node: ## start a shell on node level
-	kubectl debug node/kcd-control-plane -it --image=nicolaka/netshoot:v0.13
-
-
-
-
 
 .PHONY: debug-pod-with-profile
 debug-pod-with-profile: ## kubectl custom profile
 	$(eval POD=$(shell kubectl get pod -l run=webapp -o=jsonpath='{.items[0].metadata.name}'))
 	KUBECTL_DEBUG_CUSTOM_PROFILE=true kubectl debug --image=nicolaka/netshoot:v0.13 --custom debug-profiles/app-profile-config.json $(POD) -it
 
-.PHONY: show-dockerfile-diff
-show-dockerfile-diff: ## show container build diff
-	diff --color -Pru app/Dockerfile app/all.Dockerfile || /bin/true
+#.PHONY: show-dockerfile-diff
+#show-dockerfile-diff: ## show container build diff
+#	diff --color -Pru app/Dockerfile app/all.Dockerfile || /bin/true
 
-.PHONY: show-debug-diff
-show-debug-diff: ## show diff of k debug command
-	diff --color -Pru <(echo "kubectl debug --image=nicolaka/netshoot:v0.13 PODNAME -it") <(echo -e "KUBECTL_DEBUG_CUSTOM_PROFILE=true \nkubectl debug --image=nicolaka/netshoot:v0.13 --custom debug-profiles/app-profile-config.json PODNAME -it") || /bin/true
-	echo -e "\n\n"
-	jq '.' debug-profiles/app-profile-config.json
-
-.PHONY: show-dpm-config
-show-dpm-config: ## print dpm config
-	yq -P debug-profiles/debug-profiles.yaml
+#.PHONY: show-debug-diff
+#show-debug-diff: ## show diff of k debug command
+#	diff --color -Pru <(echo "kubectl debug --image=nicolaka/netshoot:v0.13 PODNAME -it") <(echo -e "KUBECTL_DEBUG_CUSTOM_PROFILE=true \nkubectl debug --image=nicolaka/netshoot:v0.13 --custom debug-profiles/app-profile-config.json PODNAME -it") || /bin/true
+#	echo -e "\n\n"
+#	jq '.' debug-profiles/app-profile-config.json
 
 .PHONY: run-dpm
 run-dpm: ## run k dpm
 	kubectl dpm run --profile webapp --config debug-profiles/debug-profiles.yaml
 
-.PHONY: qr-code
-qr-code: ## print dpm qr code
-	qrencode -o - -t UTF8 http://github.com/bavarianbidi/kubectl-dpm
+
 
 ##@ Prepare Stage
 
@@ -74,6 +60,7 @@ get-kubeconfig: ## Export kubeconfig.
 .PHONY: apply-webapp
 apply-webapp: ## Apply webapp.
 	kubectl apply -f app/manifest/
+	kubectl rollout restart deploy/webapp
 
 .PHONY: build-webapp
 build-webapp: ## Build webapp.
@@ -84,12 +71,17 @@ build-webapp: ## Build webapp.
 port-forward-webapp: ## Port forward webapp.
 	kubectl port-forward svc/webapp 8080:8080
 
+.PHONY: status-on-pod
+status-on-pod: ## print status on pod
+	$(eval POD=$(shell kubectl get pod -l run=webapp -o=jsonpath='{.items[0].metadata.name}'))
+	kubectl get pod $(POD) -o yaml | yq '.status.ephemeralContainerStatuses[1].state'
+	kubectl get pod $(POD) -o yaml | yq '.spec.ephemeralContainers[1]'
+
 ##@ Live Demo
 
 .PHONY: 01-access-webapp
 01-access-webapp: ## Access webapp.
-	# TODO: print the http status code and then the body
-	curl http://localhost:8080
+	curl -i http://localhost:8080
 
 .PHONY: 02-get-pod-logs
 02-get-pod-logs: ## Get the pod logs
@@ -103,29 +95,41 @@ port-forward-webapp: ## Port forward webapp.
 
 .PHONY: 04-rebuild-webapp-with-alpine
 04-rebuild-webapp-with-alpine: ## Build webapp.
-	docker build -t localhost:5000/demo-app:alpine -f app/all.Dockerfile app/
-	docker push localhost:5000/demo-app:alpine
-	GRYPE_DB_AUTO_UPDATE=false grype localhost:5000/demo-app:alpine
+#docker build -t localhost:5000/demo-app:alpine -f app/all.Dockerfile app/
+	diff --color -Pru app/Dockerfile app/all.Dockerfile || /bin/true
+	@echo ""
+	@echo ""
+	@GRYPE_DB_AUTO_UPDATE=false grype localhost:5000/demo-app:alpine -q
 
 .PHONY: 05-debug-pod
-05-debug-pod: ## kubectl debug
+05-debug-pod: ## k debug
 	$(eval POD=$(shell kubectl get pod -l run=webapp -o=jsonpath='{.items[0].metadata.name}'))
 	kubectl debug --image=nicolaka/netshoot:v0.13 $(POD) -it
 
-.PHONY: 06-run-dpm
-06-run-dpm: ## run k dpm
-	kubectl dpm run --debug --profile webapp --config debug-profiles/debug-profiles.yaml
+.PHONY: 06-print-debug-profile
+06-print-debug-profile: ## print debug profile
+	@cat debug-profiles/app-profile-config.json | jq '.'
 
-.PHONY: 06-show-kubectl-debug-command
-06-show-kubectl-debug-command: ## show k debug command with custom profile
+.PHONY: 07-show-kubectl-debug-command
+07-show-kubectl-debug-command: ## show k debug command with custom profile
 	$(eval POD=$(shell kubectl get pod -l run=webapp -o=jsonpath='{.items[0].metadata.name}'))
 	@echo "kubectl debug \
 	--namespace default \
-	--custom /home/comario/go/src/github.com/bavarianbidi/kubectl-dpm/demo/debug-profiles/app-profile-config.json \
+	--custom app-profile-config.json \
 	--image nicolaka/netshoot:v0.13 \
 	$(POD) -it"
 
+.PHONY: 08-debug-pod-with-profile
+08-debug-pod-with-profile: ## k debug with custom profile
+#kubectl dpm run --profile webapp --config debug-profiles/debug-profiles.yaml
+	kubectl dpm run --profile webapp
 
-.PHONY: 07-print-debug-profile
-07-print-debug-profile: ## print debug profile
-	@cat debug-profiles/app-profile-config.json | jq '.'
+.PHONY: 09-show-dpm-config
+09-show-dpm-config: ## print dpm config
+	@yq -P ~/.kube-dpm/debug-profiles.yaml
+
+.PHONY: 10-qr-code
+10-qr-code: ## print dpm qr code
+	@qrencode -o - -t UTF8 http://github.com/bavarianbidi/kubectl-dpm
+
+

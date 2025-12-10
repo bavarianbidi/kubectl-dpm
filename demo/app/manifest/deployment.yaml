@@ -27,9 +27,9 @@ spec:
             - name: SERVER_VERSION
               value: v1.0.0
             - name: SERVER_TITLE
-              value: "KCD Suisse Romande 2024"
+              value: "KCD Suisse Romande"
             - name: SERVER_MESSAGE
-              value: "Welcome to CERN - the home of the LHC and the place where the web was born!"
+              value: "Welcome to CERN - the place where the web was born!"
           ports:
             - name: app
               containerPort: 8080
