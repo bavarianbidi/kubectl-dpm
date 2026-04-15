@@ -3,10 +3,11 @@
 package config
 
 import (
+	"fmt"
+
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
-	"github.com/pkg/errors"
 
 	"github.com/bavarianbidi/kubectl-dpm/pkg/profile"
 )
@@ -20,12 +21,12 @@ func GenerateConfig() error {
 
 	// load config from file if given or from default paths
 	if err := k.Load(file.Provider(ConfigurationFile), yaml.Parser()); err != nil {
-		return errors.Wrap(err, "failed to load config file")
+		return fmt.Errorf("failed to load config file: %w", err)
 	}
 
 	// unmarshal all koanf config keys into the global Config struct
 	if err := k.Unmarshal("", &profile.Config); err != nil {
-		return errors.Wrap(err, "failed to unmarshal config")
+		return fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 
 	return nil

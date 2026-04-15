@@ -3,6 +3,8 @@
 package command
 
 import (
+	"fmt"
+
 	"github.com/spf13/cobra"
 
 	"github.com/bavarianbidi/kubectl-dpm/pkg/config"
@@ -16,15 +18,15 @@ func ValidateDebugProfileFile() *cobra.Command {
 
 		RunE: func(_ *cobra.Command, _ []string) error {
 			if err := config.GenerateConfig(); err != nil {
-				return err
+				return fmt.Errorf("generate config: %w", err)
 			}
 
 			if err := profile.ValidateAllProfiles(); err != nil {
-				return err
+				return fmt.Errorf("validate profiles: %w", err)
 			}
 
 			if err := generateListOutput(); err != nil {
-				return err
+				return fmt.Errorf("generate list output: %w", err)
 			}
 
 			return nil

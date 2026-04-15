@@ -23,19 +23,19 @@ func CheckKubectlVersion() error {
 
 	kubectlOutput, err := kubeclVersionCmd.Output()
 	if err != nil {
-		return err
+		return fmt.Errorf("get kubectl version output: %w", err)
 	}
 
 	kubectlVersion := &kubectlversion.Version{}
 
 	err = json.Unmarshal(kubectlOutput, kubectlVersion)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse kubectl version output: %w", err)
 	}
 
 	kubectlMinorVersion, err := strconv.Atoi(kubectlVersion.ClientVersion.Minor)
 	if err != nil {
-		return err
+		return fmt.Errorf("parse kubectl minor version %q: %w", kubectlVersion.ClientVersion.Minor, err)
 	}
 
 	if kubectlMinorVersion < 30 {
