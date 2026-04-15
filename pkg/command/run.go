@@ -35,18 +35,18 @@ func NewCmdDebugProfile(_ genericiooptions.IOStreams) *cobra.Command {
 
 		RunE: func(c *cobra.Command, args []string) error {
 			if err := config.GenerateConfig(); err != nil {
-				return err
+				return fmt.Errorf("generate config: %w", err)
 			}
 
 			// if no args are given, start interactive mode to select a profile
 			if c.Flags().NFlag() == 0 {
 				model, err := initTeaModel()
 				if err != nil {
-					return err
+					return fmt.Errorf("run debug command: %w", err)
 				}
 				p := tea.NewProgram(model)
 				if _, err := p.Run(); err != nil {
-					return fmt.Errorf("error running program: %v", err)
+					return fmt.Errorf("error running program: %w", err)
 				}
 
 				if flagProfileName == "" {
@@ -55,7 +55,7 @@ func NewCmdDebugProfile(_ genericiooptions.IOStreams) *cobra.Command {
 			}
 
 			if err := run(c.Context(), args); err != nil {
-				return err
+				return fmt.Errorf("initialize interactive mode: %w", err)
 			}
 
 			return nil
@@ -81,22 +81,22 @@ func NewCmdDebugProfile(_ genericiooptions.IOStreams) *cobra.Command {
 func run(ctx context.Context, args []string) error {
 	// validate kubectl path
 	if err := profile.ValidateKubectlPath(); err != nil {
-		return err
+		return fmt.Errorf("run debug profile: %w", err)
 	}
 
 	// check kubectl version
 	if err := profile.CheckKubectlVersion(); err != nil {
-		return err
+		return fmt.Errorf("validate kubectl path: %w", err)
 	}
 
 	// complete profile
 	if err := profile.CompleteProfile(flagProfileName); err != nil {
-		return err
+		return fmt.Errorf("check kubectl version: %w", err)
 	}
 
 	// validate profile
 	if err := profile.ValidateProfile(flagProfileName); err != nil {
-		return err
+		return fmt.Errorf("complete profile %q: %w", flagProfileName, err)
 	}
 
 	// get the index of the profile where the profile name matches
@@ -116,7 +116,7 @@ func run(ctx context.Context, args []string) error {
 		var err error
 		targetContainer, err = getTargetPod(ctx, namespace)
 		if err != nil {
-			return err
+			return fmt.Errorf("get target pod in namespace %q: %w", namespace, err)
 		}
 	default:
 		return fmt.Errorf("no target container specified")
@@ -168,7 +168,7 @@ func run(ctx context.Context, args []string) error {
 	}
 
 	if err := debugCommand.Run(); err != nil {
-		return err
+		return fmt.Errorf("validate profile %q: %w", flagProfileName, err)
 	}
 
 	return nil
@@ -177,7 +177,7 @@ func run(ctx context.Context, args []string) error {
 func getTargetPod(ctx context.Context, namespace string) (string, error) {
 	restClient, err := MatchVersionKubeConfigFlags.ToRESTConfig()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("get REST config: %w", err)
 	}
 
 	podClient := corev1client.NewForConfigOrDie(restClient)
@@ -189,7 +189,7 @@ func getTargetPod(ctx context.Context, namespace string) (string, error) {
 			}),
 	})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("list pods in namespace %q: %w", namespace, err)
 	}
 
 	if len(matchingPods.Items) == 0 {

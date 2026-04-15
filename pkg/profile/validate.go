@@ -17,11 +17,11 @@ import (
 
 func ValidateDebugProfileFile() error {
 	if err := ValidateKubectlPath(); err != nil {
-		return err
+		return fmt.Errorf("validate kubectl path: %w", err)
 	}
 
 	if err := ValidateAllProfiles(); err != nil {
-		return err
+		return fmt.Errorf("validate all profiles: %w", err)
 	}
 
 	return nil
@@ -41,7 +41,7 @@ func ValidateKubectlPath() error {
 			return fmt.Errorf("kubectl %s does not exist", Config.KubectlPath)
 		}
 		if info.IsDir() {
-			return err
+			return fmt.Errorf("kubectl path %q is a directory, not an executable", Config.KubectlPath)
 		}
 
 		mode := info.Mode()
@@ -78,7 +78,7 @@ func ValidateAllProfiles() error {
 		}
 
 		if err := ValidateProfile(p.ProfileName); err != nil {
-			return err
+			return fmt.Errorf("validate profile %q: %w", p.ProfileName, err)
 		}
 	}
 	return nil
@@ -125,7 +125,7 @@ func InteractiveProfiles() ([]Profile, error) {
 
 	err := ValidateAllProfiles()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("validate all profiles: %w", err)
 	}
 
 	var interactiveProfiles []Profile
@@ -156,13 +156,13 @@ func imageIsMissing(profileName string) bool {
 func validatePodSpec(podSpec string) error {
 	podSpecByte, err := os.ReadFile(os.ExpandEnv(podSpec))
 	if err != nil {
-		return err
+		return fmt.Errorf("read profile file %q: %w", podSpec, err)
 	}
 
 	pod := corev1.PodSpec{}
 
 	if err := json.Unmarshal(podSpecByte, &pod); err != nil {
-		return err
+		return fmt.Errorf("parse profile JSON from %q: %w", podSpec, err)
 	}
 
 	return nil

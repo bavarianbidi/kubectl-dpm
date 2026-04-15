@@ -20,11 +20,11 @@ func List() *cobra.Command {
 
 		RunE: func(_ *cobra.Command, _ []string) error {
 			if err := config.GenerateConfig(); err != nil {
-				return err
+				return fmt.Errorf("generate config: %w", err)
 			}
 
 			if err := generateListOutput(); err != nil {
-				return err
+				return fmt.Errorf("generate list output: %w", err)
 			}
 
 			return nil
