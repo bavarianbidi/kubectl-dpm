@@ -54,7 +54,7 @@ func NewCmdDebugProfile(_ genericiooptions.IOStreams) *cobra.Command {
 				}
 			}
 
-			if err := run(args); err != nil {
+			if err := run(c.Context(), args); err != nil {
 				return err
 			}
 
@@ -78,7 +78,7 @@ func NewCmdDebugProfile(_ genericiooptions.IOStreams) *cobra.Command {
 	return cmd
 }
 
-func run(args []string) error {
+func run(ctx context.Context, args []string) error {
 	// validate kubectl path
 	if err := profile.ValidateKubectlPath(); err != nil {
 		return err
@@ -114,7 +114,7 @@ func run(args []string) error {
 		targetContainer = args[0]
 	case len(debugProfile.MatchLabels) > 0:
 		var err error
-		targetContainer, err = getTargetPod(namespace)
+		targetContainer, err = getTargetPod(ctx, namespace)
 		if err != nil {
 			return err
 		}
@@ -174,7 +174,7 @@ func run(args []string) error {
 	return nil
 }
 
-func getTargetPod(namespace string) (string, error) {
+func getTargetPod(ctx context.Context, namespace string) (string, error) {
 	restClient, err := MatchVersionKubeConfigFlags.ToRESTConfig()
 	if err != nil {
 		return "", err
@@ -182,7 +182,7 @@ func getTargetPod(namespace string) (string, error) {
 
 	podClient := corev1client.NewForConfigOrDie(restClient)
 
-	matchingPods, err := podClient.Pods(namespace).List(context.TODO(), metav1.ListOptions{
+	matchingPods, err := podClient.Pods(namespace).List(ctx, metav1.ListOptions{
 		LabelSelector: metav1.FormatLabelSelector(
 			&metav1.LabelSelector{
 				MatchLabels: debugProfile.MatchLabels,

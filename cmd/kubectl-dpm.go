@@ -3,7 +3,10 @@
 package main
 
 import (
+	"context"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/spf13/pflag"
 	"k8s.io/cli-runtime/pkg/genericiooptions"
@@ -13,6 +16,8 @@ import (
 )
 
 func main() {
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
+
 	flags := pflag.NewFlagSet("kubectl-dpm", pflag.ExitOnError)
 	pflag.CommandLine = flags
 
@@ -40,7 +45,9 @@ func main() {
 	// version sub command
 	root.AddCommand(command.Version())
 
-	if err := root.Execute(); err != nil {
+	err := root.ExecuteContext(ctx)
+	stop()
+	if err != nil {
 		os.Exit(1)
 	}
 }
