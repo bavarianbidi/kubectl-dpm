@@ -3,6 +3,7 @@
 package profile
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -12,6 +13,7 @@ import (
 	"strings"
 
 	corev1 "k8s.io/api/core/v1"
+	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	kubectldebug "k8s.io/kubectl/pkg/cmd/debug"
 )
 
@@ -71,10 +73,10 @@ func ValidateAllProfiles() error {
 		switch {
 		case p.ProfileName == "":
 			Config.Profiles = slices.Delete(Config.Profiles, idx, idx)
-			return fmt.Errorf("profile %s is missing a custom profile name", p.Profile)
-		case p.Profile == "":
+			return fmt.Errorf("profile at index %d is missing a custom profile name", idx)
+		case p.ProfileSource.Type == "" && p.Profile == "":
 			Config.Profiles = slices.Delete(Config.Profiles, idx, idx)
-			return fmt.Errorf("profile name %s is either missing a profile file or the name of a built-in profile", p.ProfileName)
+			return fmt.Errorf("profile %q is missing both profileSource and profile (legacy) configuration", p.ProfileName)
 		}
 
 		if err := ValidateProfile(p.ProfileName); err != nil {
@@ -84,10 +86,106 @@ func ValidateAllProfiles() error {
 	return nil
 }
 
-// ValidateProfile validates a single profile
+// ValidateProfile validates a single profile and instantiates its ProfileSource
 func ValidateProfile(profileName string) error {
 	idx := GetProfileIdx(profileName)
+	profile := &Config.Profiles[idx]
 
+	// Check if using new ProfileSource config or legacy Profile field
+	if profile.ProfileSource.Type != "" {
+		// New ProfileSource configuration
+		return validateAndInstantiateProfileSource(profile, nil)
+	}
+
+	// Legacy Profile field - handle for backward compatibility
+	if profile.Profile == "" {
+		return fmt.Errorf("profile %q is missing both profileSource and profile fields", profileName)
+	}
+
+	return validateLegacyProfile(idx)
+}
+
+// validateAndInstantiateProfileSource creates the appropriate ProfileSource implementation
+// based on the ProfileSourceConfig. The k8sClient parameter is optional and only needed
+// for ConfigMap sources.
+func validateAndInstantiateProfileSource(p *Profile, k8sClient corev1client.CoreV1Interface) error {
+	var source ProfileSource
+	var err error
+
+	switch p.ProfileSource.Type {
+	case SourceTypeFile:
+		if p.ProfileSource.Path == "" {
+			return fmt.Errorf("file profile source requires 'path' field")
+		}
+		source = NewFileProfileSource(p.ProfileSource.Path)
+
+	case SourceTypeBuiltIn:
+		if p.ProfileSource.Name == "" {
+			return fmt.Errorf("builtin profile source requires 'name' field")
+		}
+		source, err = NewBuiltInProfileSource(p.ProfileSource.Name)
+		if err != nil {
+			return fmt.Errorf("create builtin profile source: %w", err)
+		}
+		p.SetBuiltInProfile(true)
+
+	case SourceTypeGit:
+		if p.ProfileSource.Git == nil {
+			return fmt.Errorf("git profile source requires 'git' configuration")
+		}
+		if p.ProfileSource.Git.URL == "" {
+			return fmt.Errorf("git profile source requires 'git.url' field")
+		}
+		if p.ProfileSource.Git.Path == "" {
+			return fmt.Errorf("git profile source requires 'git.path' field")
+		}
+		source = NewGitProfileSource(
+			p.ProfileSource.Git.URL,
+			p.ProfileSource.Git.Ref,
+			p.ProfileSource.Git.Path,
+		)
+
+	case SourceTypeConfigMap:
+		if p.ProfileSource.ConfigMap == nil {
+			return fmt.Errorf("configmap profile source requires 'configMap' configuration")
+		}
+		if p.ProfileSource.ConfigMap.Name == "" {
+			return fmt.Errorf("configmap profile source requires 'configMap.name' field")
+		}
+		if p.Namespace == "" {
+			return fmt.Errorf("configmap profile source requires 'namespace' field to locate the ConfigMap")
+		}
+		// For now, we'll create the source without a client during validation
+		// The actual client will be injected later when needed
+		if k8sClient != nil {
+			source = NewConfigMapProfileSource(k8sClient, p.Namespace, p.ProfileSource.ConfigMap.Name)
+		} else {
+			// Validation-only mode - we can't actually fetch the ConfigMap yet
+			// Just verify the configuration is complete
+			log.Printf("configmap profile source %q will be validated at runtime\n", p.ProfileName)
+			return nil
+		}
+
+	default:
+		return fmt.Errorf("unknown profile source type: %q (valid types: file, git, configmap, builtin)", p.ProfileSource.Type)
+	}
+
+	// Store the source implementation
+	p.SetSource(source)
+
+	// Validate by fetching the spec (except for ConfigMap during initial validation)
+	if p.ProfileSource.Type != SourceTypeConfigMap {
+		_, err = source.GetSpec(context.Background())
+		if err != nil {
+			log.Printf("profile %s validation warning: %s\n", p.ProfileName, err.Error())
+		}
+	}
+
+	return nil
+}
+
+// validateLegacyProfile validates profiles using the legacy 'profile' field
+func validateLegacyProfile(idx int) error {
 	switch Config.Profiles[idx].Profile {
 	case kubectldebug.ProfileLegacy:
 		Config.Profiles[idx].SetBuiltInProfile(true)
@@ -194,4 +292,27 @@ func CompleteStyle() {
 	if Config.Style.SelectedBackgroundColor == "" {
 		Config.Style.SelectedBackgroundColor = "#5f00ff"
 	}
+}
+
+// InitializeConfigMapSource creates and sets a ConfigMapProfileSource with the given Kubernetes client.
+// This function must be called at runtime before using a ConfigMap profile source.
+func InitializeConfigMapSource(p *Profile, client corev1client.CoreV1Interface) error {
+	if p.ProfileSource.Type != SourceTypeConfigMap {
+		return fmt.Errorf("profile is not a configmap source")
+	}
+
+	if p.ProfileSource.ConfigMap == nil || p.ProfileSource.ConfigMap.Name == "" {
+		return fmt.Errorf("configmap source configuration is missing")
+	}
+
+	source := NewConfigMapProfileSource(client, p.Namespace, p.ProfileSource.ConfigMap.Name)
+	p.SetSource(source)
+
+	// Validate by fetching the spec
+	_, err := source.GetSpec(context.Background())
+	if err != nil {
+		return fmt.Errorf("validate configmap source: %w", err)
+	}
+
+	return nil
 }

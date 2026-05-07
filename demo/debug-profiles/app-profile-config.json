@@ -17,6 +17,10 @@
         {
             "name": "DEMO",
             "value": "Hello Conference"
+        },
+        {
+            "name": "SOURCE",
+            "value": "configmap"
         }
     ]
 }

@@ -109,14 +109,135 @@ profiles:
 
 The usage is the same as with the minimal configuration.
 
+### Profile Sources (New in v0.4.0)
+
+Starting with version `v0.4.0`, `kubectl-dpm` supports multiple profile sources beyond local files. Profiles can now be fetched from:
+
+- **Local files** (original behavior)
+- **Git repositories** (public or private with PAT)
+- **Kubernetes ConfigMaps**
+- **Built-in kubectl profiles** (using the new syntax)
+
+#### Profile Source Configuration
+
+The new `profileSource` field replaces the legacy `profile` field (which is still supported for backward compatibility).
+
+**File Source** - Load profile from a local JSON file:
+```yaml
+profiles:
+  - name: my-file-profile
+    profileSource:
+      type: file
+      path: /path/to/profile.json
+    image: nicolaka/netshoot:v0.13
+    namespace: default
+    matchLabels:
+      app: myapp
+```
+
+**Built-in Source** - Use kubectl's built-in profiles:
+```yaml
+profiles:
+  - name: netadmin
+    profileSource:
+      type: builtin
+      name: netadmin  # Options: legacy, general, baseline, restricted, netadmin, sysadmin
+    image: nicolaka/netshoot:v0.13
+    namespace: default
+    matchLabels:
+      app: myapp
+```
+
+**Git Source** - Fetch profile from a Git repository:
+```yaml
+profiles:
+  - name: my-git-profile
+    profileSource:
+      type: git
+      git:
+        url: https://github.com/your-org/debug-profiles
+        ref: main  # Optional: branch, tag, or commit hash (defaults to "main")
+        path: profiles/debug-config.json
+    image: nicolaka/netshoot:v0.13
+    namespace: default
+    matchLabels:
+      app: myapp
+```
+
+For private repositories, set the `KUBECTL_DPM_GIT_TOKEN` environment variable with a personal access token:
+```bash
+export KUBECTL_DPM_GIT_TOKEN=your_github_pat
+kubectl dpm run -p my-git-profile
+```
+
+> **Note:** Git sources clone the entire repository (using shallow clone with `Depth=1` and `SingleBranch=true` for efficiency) into a temporary directory, then extract the specified file. The [go-git](https://github.com/go-git/go-git) library does not support fetching individual files without cloning the repository. While this is less efficient than fetching a single file, the shallow clone minimizes bandwidth and storage impact. The temporary clone is automatically cleaned up after the profile is read.
+
+> I will add some kind of a `raw` source to fetch a single file from remote (e.g. via HTTP) in a future release to avoid cloning repositories for simple use cases.
+> I also think about adding an additional (simple) caching layer to avoid cloning the same repository multiple times within a short period.
+> **ConfigMap Source** - Load profile from a Kubernetes ConfigMap:
+> 
+
+```yaml
+profiles:
+  - name: my-configmap-profile
+    profileSource:
+      type: configmap
+      configMap:
+        name: debug-profile-config
+    image: nicolaka/netshoot:v0.13
+    namespace: default  # ConfigMap will be fetched from this namespace
+    matchLabels:
+      app: myapp
+```
+
+The ConfigMap must contain the profile JSON in one of these keys (checked in order):
+- `profile.json`
+- `profile`
+- `spec.json`
+- `spec`
+
+Example ConfigMap:
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: debug-profile-config
+  namespace: default
+data:
+  profile.json: |
+    {
+      "volumeMounts": [
+        {
+          "mountPath": "/app/config",
+          "name": "app-config",
+          "readOnly": true
+        }
+      ]
+    }
+```
+
 ### full configuration
 
-The full configuration file looks like this:
+The full configuration file supports both legacy and new profile source formats:
 
+**Legacy format** (still supported):
 ```yaml
 profiles:
   - name: <PROFILE_NAME>
     profile: <PATH_TO_PROFILE|BUILT_IN_DEBUG_PROFILE>
+    image: <DEBUG_CONTAINER_IMAGE>
+    namespace: <NAMESPACE>
+    matchLabels:
+      <LABEL_KEY>: <LABEL_VALUE>
+```
+
+**New format** (recommended):
+```yaml
+profiles:
+  - name: <PROFILE_NAME>
+    profileSource:
+      type: <file|git|configmap|builtin>
+      # ... source-specific configuration (see Profile Sources section)
     image: <DEBUG_CONTAINER_IMAGE>
     namespace: <NAMESPACE>
     matchLabels:

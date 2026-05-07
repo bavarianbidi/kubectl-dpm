@@ -1,5 +1,8 @@
 kubectlPath: ${HOME}/bin/kubectl
 profiles:
+  # ==========================================
+  # LEGACY FORMAT (still supported for backward compatibility)
+  # ==========================================
   - name: prometheus
     profile: /home/comario/go/src/github.com/bavarianbidi/kubectl-dpm/demo/debug-profiles/prom-profile-config.json
     image: nicolaka/netshoot:v0.13
@@ -15,3 +18,61 @@ profiles:
   - name: demo
     profile: /home/comario/go/src/github.com/bavarianbidi/kubectl-dpm/demo/debug-profiles/app-profile-config.json
     image: nicolaka/netshoot:v0.13
+
+  # ==========================================
+  # NEW PROFILE SOURCE FORMAT
+  # ==========================================
+
+  # File-based profile (local JSON file)
+  - name: app-from-file
+    profileSource:
+      type: file
+      path: ${HOME}/go/src/github.com/bavarianbidi/kubectl-dpm/demo/debug-profiles/app-profile-config.json
+    image: nicolaka/netshoot:v0.13
+    namespace: default
+    matchLabels:
+      run: webapp
+
+  # Built-in kubectl profile (netadmin)
+  - name: netadmin-builtin
+    profileSource:
+      type: builtin
+      name: netadmin
+    image: nicolaka/netshoot:v0.13
+    namespace: default
+    matchLabels:
+      run: webapp
+
+  # Built-in kubectl profile (sysadmin)
+  - name: sysadmin-builtin
+    profileSource:
+      type: builtin
+      name: sysadmin
+    image: nicolaka/netshoot:v0.13
+    namespace: default
+    matchLabels:
+      run: webapp
+
+  # Git repository source
+  - name: profile-from-git
+    profileSource:
+      type: git
+      git:
+        url: https://github.com/bavarianbidi/kubectl-dpm
+        path: demo/debug-profiles/app-profile-config.json
+    image: nicolaka/netshoot:v0.13
+    namespace: default
+    matchLabels:
+      run: webapp
+
+  # ConfigMap source (fetched from Kubernetes at runtime)
+  - name: profile-from-configmap
+    profileSource:
+      type: configmap
+      configMap:
+        name: debug-profile
+        # namespace is taken from the profile's namespace field
+    image: nicolaka/netshoot:v0.13
+    namespace: default # ConfigMap will be fetched from this namespace
+    matchLabels:
+      run: webapp

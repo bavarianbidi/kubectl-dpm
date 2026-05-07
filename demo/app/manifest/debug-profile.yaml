@@ -1,0 +1,29 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: debug-profile
+  namespace: default
+data:
+  profile.json: |-
+    {
+        "volumeMounts": [
+            {
+                "mountPath": "/app/config",
+                "name": "app-config",
+                "readOnly": true
+            }
+        ],
+        "securityContext": {
+            "capabilities": {
+                "add": [
+                    "CAP_NET_ADMIN"
+                ]
+            }
+        },
+        "env": [
+            {
+                "name": "SOURCE",
+                "value": "configmap"
+            }
+        ]
+    }
