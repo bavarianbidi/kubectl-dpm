@@ -8,3 +8,7 @@ var (
 	flagDebug       bool
 	flagVerboseList bool
 )
+
+const (
+	profileFlagName = "profile"
+)

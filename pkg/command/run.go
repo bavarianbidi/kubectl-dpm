@@ -38,8 +38,8 @@ func NewCmdDebugProfile(_ genericiooptions.IOStreams) *cobra.Command {
 				return fmt.Errorf("generate config: %w", err)
 			}
 
-			// if no args are given, start interactive mode to select a profile
-			if c.Flags().NFlag() == 0 {
+			// if no profile flag is set, start interactive mode to select a profile
+			if !c.Flags().Changed(profileFlagName) {
 				model, err := initTeaModel()
 				if err != nil {
 					return fmt.Errorf("run debug command: %w", err)
@@ -71,7 +71,7 @@ func NewCmdDebugProfile(_ genericiooptions.IOStreams) *cobra.Command {
 	kubeConfigFlags.AddFlags(flags)
 
 	// add custom flag
-	cmd.Flags().StringVarP(&flagProfileName, "profile", "p", "", "profile name")
+	cmd.Flags().StringVarP(&flagProfileName, profileFlagName, "p", "", "profile name")
 	cmd.Flags().StringVarP(&flagImage, "image", "i", "", "image to use for the debug container")
 	cmd.Flags().BoolVarP(&flagDebug, "debug", "d", false, "print debug information")
 
@@ -100,7 +100,10 @@ func run(ctx context.Context, args []string) error {
 	}
 
 	// get the index of the profile where the profile name matches
-	idx := profile.GetProfileIdx(flagProfileName)
+	idx, err := profile.GetProfileIdx(flagProfileName)
+	if err != nil {
+		return err
+	}
 
 	debugProfile = profile.Config.Profiles[idx]
 
