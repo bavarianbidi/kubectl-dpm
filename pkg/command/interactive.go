@@ -5,7 +5,6 @@ package command
 import (
 	bubbletable "github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 
 	"github.com/bavarianbidi/kubectl-dpm/pkg/profile"
 	"github.com/bavarianbidi/kubectl-dpm/pkg/table"
@@ -25,22 +24,7 @@ func initTeaModel() (model, error) {
 
 	// generate the table with image, namespace and matchLabels columns
 	t := table.GenerateTable(interactiveProfiles, true)
-
-	// read the style config from profile and apply it
-	profile.CompleteStyle()
-
-	s := bubbletable.DefaultStyles()
-	s.Header = s.Header.
-		BorderStyle(lipgloss.NormalBorder()).
-		Background(lipgloss.Color(profile.Config.Style.HeaderBackgroundColor)).
-		Foreground(lipgloss.Color(profile.Config.Style.HeaderForegroundColor)).
-		BorderBottom(true).
-		Bold(true)
-	s.Selected = s.Selected.
-		Foreground(lipgloss.Color(profile.Config.Style.SelectedForegroundColor)).
-		Background(lipgloss.Color(profile.Config.Style.SelectedBackgroundColor)).
-		Bold(false)
-	t.SetStyles(s)
+	table.ConfigureInteractive(&t)
 
 	return model{
 		table: t,
