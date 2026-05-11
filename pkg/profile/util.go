@@ -4,6 +4,7 @@ package profile
 
 import (
 	"cmp"
+	"fmt"
 	"slices"
 	"strings"
 )
@@ -15,7 +16,11 @@ func SortProfiles() {
 	})
 }
 
-func GetProfileIdx(profileName string) int {
+func GetProfileIdx(profileName string) (int, error) {
 	// get the index of the profile where the profile name matches
-	return slices.IndexFunc(Config.Profiles, func(c Profile) bool { return c.ProfileName == profileName })
+	idx := slices.IndexFunc(Config.Profiles, func(c Profile) bool { return c.ProfileName == profileName })
+	if idx == -1 {
+		return -1, fmt.Errorf("profile %q not found", profileName)
+	}
+	return idx, nil
 }

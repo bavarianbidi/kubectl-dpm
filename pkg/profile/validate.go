@@ -88,7 +88,10 @@ func ValidateAllProfiles() error {
 
 // ValidateProfile validates a single profile and instantiates its ProfileSource
 func ValidateProfile(profileName string) error {
-	idx := GetProfileIdx(profileName)
+	idx, err := GetProfileIdx(profileName)
+	if err != nil {
+		return err
+	}
 	profile := &Config.Profiles[idx]
 
 	// Check if using new ProfileSource config or legacy Profile field
@@ -240,15 +243,27 @@ func InteractiveProfiles() ([]Profile, error) {
 }
 
 func namespaceIsMissing(profileName string) bool {
-	return Config.Profiles[GetProfileIdx(profileName)].Namespace == ""
+	idx, err := GetProfileIdx(profileName)
+	if err != nil {
+		return true
+	}
+	return Config.Profiles[idx].Namespace == ""
 }
 
 func labelSelectorIsMissing(profileName string) bool {
-	return Config.Profiles[GetProfileIdx(profileName)].MatchLabels == nil
+	idx, err := GetProfileIdx(profileName)
+	if err != nil {
+		return true
+	}
+	return Config.Profiles[idx].MatchLabels == nil
 }
 
 func imageIsMissing(profileName string) bool {
-	return Config.Profiles[GetProfileIdx(profileName)].Image == ""
+	idx, err := GetProfileIdx(profileName)
+	if err != nil {
+		return true
+	}
+	return Config.Profiles[idx].Image == ""
 }
 
 func validatePodSpec(podSpec string) error {
@@ -269,7 +284,10 @@ func validatePodSpec(podSpec string) error {
 // CompleteProfile completes a profile with default values
 func CompleteProfile(profileName string) error {
 	// get the index of the profile where the profile name matches
-	idx := GetProfileIdx(profileName)
+	idx, err := GetProfileIdx(profileName)
+	if err != nil {
+		return err
+	}
 
 	if Config.Profiles[idx].ImagePullPolicy == "" {
 		Config.Profiles[idx].ImagePullPolicy = corev1.PullIfNotPresent
