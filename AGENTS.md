@@ -2,7 +2,7 @@
 
 # kubectl-dpm Developer Notes
 
-`kubectl-dpm` is a kubectl plugin for managing Kubernetes debug profiles. Written in Go 1.26.2.
+`kubectl-dpm` is a kubectl plugin for managing Kubernetes debug profiles. Written in Go 1.26.3.
 
 ## Commands
 
