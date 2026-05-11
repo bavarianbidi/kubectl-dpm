@@ -104,6 +104,25 @@ func run(ctx context.Context, args []string) error {
 
 	debugProfile = profile.Config.Profiles[idx]
 
+	// For ConfigMap sources, we need to inject a Kubernetes client
+	if debugProfile.ProfileSource.Type == profile.SourceTypeConfigMap && debugProfile.GetSource() == nil {
+		restClient, err := MatchVersionKubeConfigFlags.ToRESTConfig()
+		if err != nil {
+			return fmt.Errorf("get REST config: %w", err)
+		}
+
+		clientset, err := corev1client.NewForConfig(restClient)
+		if err != nil {
+			return fmt.Errorf("create k8s clientset: %w", err)
+		}
+
+		// Inject the client and validate the ConfigMap source
+		if err := profile.InitializeConfigMapSource(&debugProfile, clientset); err != nil {
+			return fmt.Errorf("initialize configmap source: %w", err)
+		}
+		profile.Config.Profiles[idx] = debugProfile
+	}
+
 	var targetContainer string
 	namespace := getTargetNamespace()
 
@@ -125,33 +144,94 @@ func run(ctx context.Context, args []string) error {
 	if flagDebug {
 		fmt.Printf("Using profile: %+v\n", debugProfile)
 		fmt.Printf("kubectl path: %s\n", os.ExpandEnv(profile.Config.KubectlPath))
-		fmt.Printf("profile path: %s\n", debugProfile.Profile)
-		fmt.Printf("profile path resolved: %s\n", os.ExpandEnv(debugProfile.Profile))
+		if debugProfile.GetSource() != nil {
+			fmt.Printf("profile source type: %s\n", debugProfile.GetSource().Type())
+		} else {
+			fmt.Printf("profile path (legacy): %s\n", debugProfile.Profile)
+			fmt.Printf("profile path resolved (legacy): %s\n", os.ExpandEnv(debugProfile.Profile))
+		}
 	}
 
 	var debugCommand *exec.Cmd
 
-	switch {
-	case debugProfile.IsBuiltInProfile():
-		// nolint:gosec
-		debugCommand = exec.Command(
-			os.ExpandEnv(profile.Config.KubectlPath),
-			"debug",
-			"--namespace", namespace,
-			"--profile", debugProfile.Profile,
-			"--image", debugProfile.Image, targetContainer,
-			"-it",
-		)
-	default:
-		// nolint:gosec
-		debugCommand = exec.Command(
-			os.ExpandEnv(profile.Config.KubectlPath),
-			"debug",
-			"--namespace", namespace,
-			"--custom", os.ExpandEnv(debugProfile.Profile),
-			"--image", debugProfile.Image, targetContainer,
-			"-it",
-		)
+	// Use ProfileSource if available, otherwise fall back to legacy Profile field
+	if debugProfile.GetSource() != nil {
+		source := debugProfile.GetSource()
+
+		if source.Type() == profile.SourceTypeBuiltIn {
+			// Built-in profile - use --profile flag with the profile name
+			builtInSource, ok := source.(*profile.BuiltInProfileSource)
+			if !ok {
+				return fmt.Errorf("internal error: built-in source type assertion failed")
+			}
+
+			// nolint:gosec
+			debugCommand = exec.Command(
+				os.ExpandEnv(profile.Config.KubectlPath),
+				"debug",
+				"--namespace", namespace,
+				"--profile", builtInSource.ProfileName(),
+				"--image", debugProfile.Image, targetContainer,
+				"-it",
+			)
+		} else {
+			// Custom profile - fetch spec and write to temp file
+			specData, err := source.GetSpec(ctx)
+			if err != nil {
+				return fmt.Errorf("fetch profile spec from %s source: %w", source.Type(), err)
+			}
+
+			// Create temp file for the profile spec
+			tmpFile, err := os.CreateTemp("", "kubectl-dpm-profile-*.json")
+			if err != nil {
+				return fmt.Errorf("create temp file for profile spec: %w", err)
+			}
+			defer os.Remove(tmpFile.Name())
+
+			if _, err := tmpFile.Write(specData); err != nil {
+				tmpFile.Close()
+				return fmt.Errorf("write profile spec to temp file: %w", err)
+			}
+			tmpFile.Close()
+
+			if flagDebug {
+				fmt.Printf("profile spec written to temp file: %s\n", tmpFile.Name())
+			}
+
+			// nolint:gosec
+			debugCommand = exec.Command(
+				os.ExpandEnv(profile.Config.KubectlPath),
+				"debug",
+				"--namespace", namespace,
+				"--custom", tmpFile.Name(),
+				"--image", debugProfile.Image, targetContainer,
+				"-it",
+			)
+		}
+	} else {
+		// Legacy profile field
+		switch {
+		case debugProfile.IsBuiltInProfile():
+			// nolint:gosec
+			debugCommand = exec.Command(
+				os.ExpandEnv(profile.Config.KubectlPath),
+				"debug",
+				"--namespace", namespace,
+				"--profile", debugProfile.Profile,
+				"--image", debugProfile.Image, targetContainer,
+				"-it",
+			)
+		default:
+			// nolint:gosec
+			debugCommand = exec.Command(
+				os.ExpandEnv(profile.Config.KubectlPath),
+				"debug",
+				"--namespace", namespace,
+				"--custom", os.ExpandEnv(debugProfile.Profile),
+				"--image", debugProfile.Image, targetContainer,
+				"-it",
+			)
+		}
 	}
 
 	debugCommand.Env = os.Environ()
