@@ -26,13 +26,15 @@ func Version() *cobra.Command {
 		Use:   "version",
 		Short: "print current version",
 
-		Run: func(_ *cobra.Command, _ []string) {
-			fmt.Printf("Version:\t%s\n", appVersion)
-			fmt.Printf("BuildTime:\t%s\n", buildDate)
-			fmt.Printf("GitCommit:\t%s\n", gitCommit)
-			fmt.Printf("GoVersion:\t%s\n", runtime.Version())
-			fmt.Printf("Compiler:\t%s\n", runtime.Compiler)
-			fmt.Printf("OS/Arch:\t%s/%s\n", runtime.GOOS, runtime.GOARCH)
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			w := cmd.OutOrStdout()
+			fmt.Fprintf(w, "Version:\t%s\n", appVersion)
+			fmt.Fprintf(w, "BuildTime:\t%s\n", buildDate)
+			fmt.Fprintf(w, "GitCommit:\t%s\n", gitCommit)
+			fmt.Fprintf(w, "GoVersion:\t%s\n", runtime.Version())
+			fmt.Fprintf(w, "Compiler:\t%s\n", runtime.Compiler)
+			fmt.Fprintf(w, "OS/Arch:\t%s/%s\n", runtime.GOOS, runtime.GOARCH)
+			return nil
 		},
 	}
 }

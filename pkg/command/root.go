@@ -8,7 +8,9 @@ import (
 
 func Root() *cobra.Command {
 	return &cobra.Command{
-		Use:   "kubectl-dpm",
-		Short: "kubectl debug profile manager",
+		Use:           "kubectl-dpm",
+		Short:         "kubectl debug profile manager",
+		SilenceUsage:  false,
+		SilenceErrors: false,
 	}
 }
