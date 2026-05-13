@@ -3,6 +3,8 @@
 package command
 
 import (
+	"context"
+
 	bubbletable "github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 
@@ -15,9 +17,9 @@ type model struct {
 }
 
 // initTeaModel initializes the model for the interactive mode
-func initTeaModel() (model, error) {
+func initTeaModel(ctx context.Context) (model, error) {
 	// generate a list of profiles which work in interactive mode
-	interactiveProfiles, err := profile.InteractiveProfiles()
+	interactiveProfiles, err := profile.InteractiveProfiles(ctx)
 	if err != nil {
 		return model{}, err
 	}

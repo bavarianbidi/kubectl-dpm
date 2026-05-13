@@ -17,12 +17,12 @@ import (
 	kubectldebug "k8s.io/kubectl/pkg/cmd/debug"
 )
 
-func ValidateDebugProfileFile() error {
+func ValidateDebugProfileFile(ctx context.Context) error {
 	if err := ValidateKubectlPath(); err != nil {
 		return fmt.Errorf("validate kubectl path: %w", err)
 	}
 
-	if err := ValidateAllProfiles(); err != nil {
+	if err := ValidateAllProfiles(ctx); err != nil {
 		return fmt.Errorf("validate all profiles: %w", err)
 	}
 
@@ -54,7 +54,7 @@ func ValidateKubectlPath() error {
 	return nil
 }
 
-func ValidateAllProfiles() error {
+func ValidateAllProfiles(ctx context.Context) error {
 	// sort profiles by name
 	SortProfiles()
 
@@ -79,7 +79,7 @@ func ValidateAllProfiles() error {
 			return fmt.Errorf("profile %q is missing both profileSource and profile (legacy) configuration", p.ProfileName)
 		}
 
-		if err := ValidateProfile(p.ProfileName); err != nil {
+		if err := ValidateProfile(ctx, p.ProfileName); err != nil {
 			return fmt.Errorf("validate profile %q: %w", p.ProfileName, err)
 		}
 	}
@@ -87,7 +87,7 @@ func ValidateAllProfiles() error {
 }
 
 // ValidateProfile validates a single profile and instantiates its ProfileSource
-func ValidateProfile(profileName string) error {
+func ValidateProfile(ctx context.Context, profileName string) error {
 	idx, err := GetProfileIdx(profileName)
 	if err != nil {
 		return err
@@ -97,7 +97,7 @@ func ValidateProfile(profileName string) error {
 	// Check if using new ProfileSource config or legacy Profile field
 	if profile.ProfileSource.Type != "" {
 		// New ProfileSource configuration
-		return validateAndInstantiateProfileSource(profile, nil)
+		return validateAndInstantiateProfileSource(ctx, profile, nil)
 	}
 
 	// Legacy Profile field - handle for backward compatibility
@@ -111,7 +111,7 @@ func ValidateProfile(profileName string) error {
 // validateAndInstantiateProfileSource creates the appropriate ProfileSource implementation
 // based on the ProfileSourceConfig. The k8sClient parameter is optional and only needed
 // for ConfigMap sources.
-func validateAndInstantiateProfileSource(p *Profile, k8sClient corev1client.CoreV1Interface) error {
+func validateAndInstantiateProfileSource(ctx context.Context, p *Profile, k8sClient corev1client.CoreV1Interface) error {
 	var source ProfileSource
 	var err error
 
@@ -178,7 +178,7 @@ func validateAndInstantiateProfileSource(p *Profile, k8sClient corev1client.Core
 
 	// Validate by fetching the spec (except for ConfigMap during initial validation)
 	if p.ProfileSource.Type != SourceTypeConfigMap {
-		_, err = source.GetSpec(context.Background())
+		_, err = source.GetSpec(ctx)
 		if err != nil {
 			log.Printf("profile %s validation warning: %s\n", p.ProfileName, err.Error())
 		}
@@ -220,11 +220,11 @@ func validateLegacyProfile(idx int) error {
 // InteractiveProfiles returns all profiles that can be used from
 // the interactive mode, dpm run (without args)
 // these profiles do have all required fields set (namespace, labelSelector, image)
-func InteractiveProfiles() ([]Profile, error) {
+func InteractiveProfiles(ctx context.Context) ([]Profile, error) {
 	// sort profiles by name
 	SortProfiles()
 
-	err := ValidateAllProfiles()
+	err := ValidateAllProfiles(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("validate all profiles: %w", err)
 	}
@@ -314,7 +314,7 @@ func CompleteStyle() {
 
 // InitializeConfigMapSource creates and sets a ConfigMapProfileSource with the given Kubernetes client.
 // This function must be called at runtime before using a ConfigMap profile source.
-func InitializeConfigMapSource(p *Profile, client corev1client.CoreV1Interface) error {
+func InitializeConfigMapSource(ctx context.Context, p *Profile, client corev1client.CoreV1Interface) error {
 	if p.ProfileSource.Type != SourceTypeConfigMap {
 		return fmt.Errorf("profile is not a configmap source")
 	}
@@ -327,7 +327,7 @@ func InitializeConfigMapSource(p *Profile, client corev1client.CoreV1Interface) 
 	p.SetSource(source)
 
 	// Validate by fetching the spec
-	_, err := source.GetSpec(context.Background())
+	_, err := source.GetSpec(ctx)
 	if err != nil {
 		return fmt.Errorf("validate configmap source: %w", err)
 	}

@@ -3,6 +3,7 @@
 package profile
 
 import (
+	"context"
 	"os"
 	"reflect"
 	"testing"
@@ -171,7 +172,7 @@ func TestValidateAllProfiles(t *testing.T) {
 			// set the global Config variable to the test config
 			Config = tt.config
 
-			if err := ValidateAllProfiles(); (err != nil) != tt.wantErr {
+			if err := ValidateAllProfiles(context.Background()); (err != nil) != tt.wantErr {
 				t.Errorf("ValidateAllProfiles() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if !tt.wantErr && !reflect.DeepEqual(tt.wantedConfig, Config) {
@@ -289,7 +290,7 @@ func TestCompleteProfile(t *testing.T) {
 			},
 		}
 		t.Run(tt.name, func(t *testing.T) {
-			if err := ValidateProfile(tt.profileName); (err != nil) != tt.wantErr {
+			if err := ValidateProfile(context.Background(), tt.profileName); (err != nil) != tt.wantErr {
 				t.Errorf("ValidateProfile() error = %v, wantErr %v", err, tt.wantErr)
 			}
 			if err := CompleteProfile(tt.profileName); (err != nil) != tt.wantErr {

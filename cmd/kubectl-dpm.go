@@ -16,7 +16,14 @@ import (
 )
 
 func main() {
+	if err := run(); err != nil {
+		os.Exit(1)
+	}
+}
+
+func run() error {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
+	defer stop()
 
 	flags := pflag.NewFlagSet("kubectl-dpm", pflag.ExitOnError)
 	pflag.CommandLine = flags
@@ -45,9 +52,5 @@ func main() {
 	// version sub command
 	root.AddCommand(command.Version())
 
-	err := root.ExecuteContext(ctx)
-	stop()
-	if err != nil {
-		os.Exit(1)
-	}
+	return root.ExecuteContext(ctx)
 }

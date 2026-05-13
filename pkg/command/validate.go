@@ -16,12 +16,12 @@ func ValidateDebugProfileFile() *cobra.Command {
 		Use:   "validate",
 		Short: "validate debug profiles configuration file",
 
-		RunE: func(_ *cobra.Command, _ []string) error {
+		RunE: func(c *cobra.Command, _ []string) error {
 			if err := config.GenerateConfig(); err != nil {
 				return fmt.Errorf("generate config: %w", err)
 			}
 
-			if err := profile.ValidateAllProfiles(); err != nil {
+			if err := profile.ValidateAllProfiles(c.Context()); err != nil {
 				return fmt.Errorf("validate profiles: %w", err)
 			}
 
