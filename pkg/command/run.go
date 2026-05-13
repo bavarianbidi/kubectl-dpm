@@ -26,12 +26,14 @@ var (
 	debugProfile                profile.Profile
 )
 
-func NewCmdDebugProfile(_ genericiooptions.IOStreams) *cobra.Command {
+func NewCmdDebugProfile(streams genericiooptions.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "run",
 		// DisableFlagsInUseLine: true,
 		Short: "create an ephemeral debug container in a pod",
 		Long:  "create an ephemeral debug container in a pod by using the kubectl debug implementation and a custom profile",
+		// at most one argument is allowed, which is the target pod name. If no argument is provided, the plugin will try to find a target pod based on the profile's matchLabels and use the first container in that pod as target.
+		Args: cobra.MaximumNArgs(1),
 
 		RunE: func(c *cobra.Command, args []string) error {
 			if err := config.GenerateConfig(); err != nil {
@@ -54,7 +56,7 @@ func NewCmdDebugProfile(_ genericiooptions.IOStreams) *cobra.Command {
 				}
 			}
 
-			if err := run(c.Context(), args); err != nil {
+			if err := run(c.Context(), args, streams); err != nil {
 				return fmt.Errorf("initialize interactive mode: %w", err)
 			}
 
@@ -78,7 +80,7 @@ func NewCmdDebugProfile(_ genericiooptions.IOStreams) *cobra.Command {
 	return cmd
 }
 
-func run(ctx context.Context, args []string) error {
+func run(ctx context.Context, args []string, streams genericiooptions.IOStreams) error {
 	// validate kubectl path
 	if err := profile.ValidateKubectlPath(); err != nil {
 		return fmt.Errorf("run debug profile: %w", err)
@@ -130,8 +132,6 @@ func run(ctx context.Context, args []string) error {
 	namespace := getTargetNamespace()
 
 	switch {
-	case len(args) > 1:
-		return fmt.Errorf("too many arguments")
 	case len(args) == 1:
 		targetContainer = args[0]
 	case len(debugProfile.MatchLabels) > 0:
@@ -145,13 +145,13 @@ func run(ctx context.Context, args []string) error {
 	}
 
 	if flagDebug {
-		fmt.Printf("Using profile: %+v\n", debugProfile)
-		fmt.Printf("kubectl path: %s\n", os.ExpandEnv(profile.Config.KubectlPath))
+		fmt.Fprintf(streams.Out, "Using profile: %+v\n", debugProfile)
+		fmt.Fprintf(streams.Out, "kubectl path: %s\n", os.ExpandEnv(profile.Config.KubectlPath))
 		if debugProfile.GetSource() != nil {
-			fmt.Printf("profile source type: %s\n", debugProfile.GetSource().Type())
+			fmt.Fprintf(streams.Out, "profile source type: %s\n", debugProfile.GetSource().Type())
 		} else {
-			fmt.Printf("profile path (legacy): %s\n", debugProfile.Profile)
-			fmt.Printf("profile path resolved (legacy): %s\n", os.ExpandEnv(debugProfile.Profile))
+			fmt.Fprintf(streams.Out, "profile path (legacy): %s\n", debugProfile.Profile)
+			fmt.Fprintf(streams.Out, "profile path resolved (legacy): %s\n", os.ExpandEnv(debugProfile.Profile))
 		}
 	}
 
@@ -198,7 +198,7 @@ func run(ctx context.Context, args []string) error {
 			tmpFile.Close()
 
 			if flagDebug {
-				fmt.Printf("profile spec written to temp file: %s\n", tmpFile.Name())
+				fmt.Fprintf(streams.Out, "profile spec written to temp file: %s\n", tmpFile.Name())
 			}
 
 			// nolint:gosec
@@ -242,12 +242,12 @@ func run(ctx context.Context, args []string) error {
 	// explicitly set it to true to support kubectl versions < 1.34
 	debugCommand.Env = append(debugCommand.Env, string("KUBECTL_DEBUG_CUSTOM_PROFILE=true"))
 
-	debugCommand.Stdout = os.Stdout
-	debugCommand.Stderr = os.Stderr
-	debugCommand.Stdin = os.Stdin
+	debugCommand.Stdout = streams.Out
+	debugCommand.Stderr = streams.ErrOut
+	debugCommand.Stdin = streams.In
 
 	if flagDebug {
-		fmt.Printf("Running command: %s\n", debugCommand.String())
+		fmt.Fprintf(streams.Out, "Running command: %s\n", debugCommand.String())
 	}
 
 	if err := debugCommand.Run(); err != nil {

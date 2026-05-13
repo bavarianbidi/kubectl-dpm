@@ -4,7 +4,7 @@ package command
 
 import (
 	"fmt"
-	"os"
+	"io"
 
 	"github.com/spf13/cobra"
 
@@ -18,12 +18,12 @@ func List() *cobra.Command {
 		Use:   "list",
 		Short: "list all profiles",
 
-		RunE: func(_ *cobra.Command, _ []string) error {
+		RunE: func(cmd *cobra.Command, _ []string) error {
 			if err := config.GenerateConfig(); err != nil {
 				return fmt.Errorf("generate config: %w", err)
 			}
 
-			if err := generateListOutput(); err != nil {
+			if err := generateListOutput(cmd.OutOrStdout()); err != nil {
 				return fmt.Errorf("generate list output: %w", err)
 			}
 
@@ -36,11 +36,11 @@ func List() *cobra.Command {
 	return listCmd
 }
 
-func generateListOutput() error {
+func generateListOutput(w io.Writer) error {
 	tbl := table.GenerateTable(profile.Config.Profiles, flagVerboseList)
 	table.ConfigureStatic(&tbl)
 
-	if _, err := fmt.Fprintln(os.Stdout, tbl.View()); err != nil {
+	if _, err := fmt.Fprintln(w, tbl.View()); err != nil {
 		return fmt.Errorf("print list table: %w", err)
 	}
 

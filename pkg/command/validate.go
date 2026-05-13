@@ -25,10 +25,6 @@ func ValidateDebugProfileFile() *cobra.Command {
 				return fmt.Errorf("validate profiles: %w", err)
 			}
 
-			if err := generateListOutput(); err != nil {
-				return fmt.Errorf("generate list output: %w", err)
-			}
-
 			return nil
 		},
 	}
