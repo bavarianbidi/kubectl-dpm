@@ -40,7 +40,7 @@ func NewCmdDebugProfile(_ genericiooptions.IOStreams) *cobra.Command {
 
 			// if no profile flag is set, start interactive mode to select a profile
 			if !c.Flags().Changed(profileFlagName) {
-				model, err := initTeaModel()
+				model, err := initTeaModel(c.Context())
 				if err != nil {
 					return fmt.Errorf("run debug command: %w", err)
 				}
@@ -95,7 +95,7 @@ func run(ctx context.Context, args []string) error {
 	}
 
 	// validate profile
-	if err := profile.ValidateProfile(flagProfileName); err != nil {
+	if err := profile.ValidateProfile(ctx, flagProfileName); err != nil {
 		return fmt.Errorf("complete profile %q: %w", flagProfileName, err)
 	}
 
@@ -120,7 +120,7 @@ func run(ctx context.Context, args []string) error {
 		}
 
 		// Inject the client and validate the ConfigMap source
-		if err := profile.InitializeConfigMapSource(&debugProfile, clientset); err != nil {
+		if err := profile.InitializeConfigMapSource(ctx, &debugProfile, clientset); err != nil {
 			return fmt.Errorf("initialize configmap source: %w", err)
 		}
 		profile.Config.Profiles[idx] = debugProfile
