@@ -190,6 +190,8 @@ func validateAndInstantiateProfileSource(ctx context.Context, p *Profile, k8sCli
 // validateLegacyProfile validates profiles using the legacy 'profile' field
 func validateLegacyProfile(idx int) error {
 	switch Config.Profiles[idx].Profile {
+	// SA1019: ProfileLegacy is deprecated: legacyProfile is planned to be removed in v1.39
+	// nolint:staticcheck
 	case kubectldebug.ProfileLegacy:
 		Config.Profiles[idx].SetBuiltInProfile(true)
 		return nil

@@ -21,6 +21,8 @@ type BuiltInProfileSource struct {
 func NewBuiltInProfileSource(name string) (*BuiltInProfileSource, error) {
 	// Validate it's a known built-in profile
 	validNames := []string{
+		// SA1019: ProfileLegacy is deprecated: legacyProfile is planned to be removed in v1.39
+		// nolint:staticcheck
 		kubectldebug.ProfileLegacy,
 		kubectldebug.ProfileGeneral,
 		kubectldebug.ProfileBaseline,
