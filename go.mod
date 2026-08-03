@@ -10,11 +10,11 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/api v0.36.2
-	k8s.io/apimachinery v0.36.2
-	k8s.io/cli-runtime v0.36.2
-	k8s.io/client-go v0.36.2
-	k8s.io/kubectl v0.36.2
+	k8s.io/api v0.36.3
+	k8s.io/apimachinery v0.36.3
+	k8s.io/cli-runtime v0.36.3
+	k8s.io/client-go v0.36.3
+	k8s.io/kubectl v0.36.3
 )
 
 require (
@@ -534,11 +534,11 @@ require (
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	honnef.co/go/tools v0.6.0 // indirect
-	k8s.io/component-base v0.36.2 // indirect
-	k8s.io/component-helpers v0.36.2 // indirect
+	k8s.io/component-base v0.36.3 // indirect
+	k8s.io/component-helpers v0.36.3 // indirect
 	k8s.io/klog/v2 v2.140.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20260317180543-43fb72c5454a // indirect
-	k8s.io/streaming v0.36.2 // indirect
+	k8s.io/streaming v0.36.3 // indirect
 	k8s.io/utils v0.0.0-20260210185600-b8788abfbbc2 // indirect
 	lukechampine.com/blake3 v1.2.1 // indirect
 	modernc.org/libc v1.37.6 // indirect
@@ -554,7 +554,7 @@ require (
 	sigs.k8s.io/kustomize/kyaml v0.21.1 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
 	sigs.k8s.io/release-utils v0.7.7 // indirect
-	sigs.k8s.io/structured-merge-diff/v6 v6.3.2 // indirect
+	sigs.k8s.io/structured-merge-diff/v6 v6.3.3 // indirect
 	sigs.k8s.io/yaml v1.6.0 // indirect
 	software.sslmate.com/src/go-pkcs12 v0.4.0 // indirect
 )
