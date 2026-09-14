@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	corev1 "k8s.io/api/core/v1"
 )
@@ -24,7 +25,7 @@ func NewFileProfileSource(path string) *FileProfileSource {
 // GetSpec reads and returns the JSON specification from the file.
 func (f *FileProfileSource) GetSpec(_ context.Context) ([]byte, error) {
 	expandedPath := os.ExpandEnv(f.path)
-	data, err := os.ReadFile(expandedPath)
+	data, err := os.ReadFile(filepath.Clean(expandedPath))
 	if err != nil {
 		return nil, fmt.Errorf("read profile file %q: %w", f.path, err)
 	}

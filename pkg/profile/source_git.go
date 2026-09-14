@@ -76,7 +76,7 @@ func (g *GitProfileSource) GetSpec(ctx context.Context) ([]byte, error) {
 
 	// Read the profile file
 	profilePath := filepath.Join(tmpDir, g.path)
-	data, err := os.ReadFile(profilePath)
+	data, err := os.ReadFile(filepath.Clean(profilePath))
 	if err != nil {
 		return nil, fmt.Errorf("read profile file %q from git repo: %w", g.path, err)
 	}
