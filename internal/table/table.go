@@ -9,7 +9,7 @@ import (
 	bubbletable "github.com/charmbracelet/bubbles/table"
 	"github.com/charmbracelet/lipgloss"
 
-	"github.com/bavarianbidi/kubectl-dpm/pkg/profile"
+	"github.com/bavarianbidi/kubectl-dpm/internal/profile"
 )
 
 func GenerateTable(profiles []profile.Profile, wide bool) bubbletable.Model {

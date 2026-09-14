@@ -8,8 +8,8 @@ import (
 	bubbletable "github.com/charmbracelet/bubbles/table"
 	tea "github.com/charmbracelet/bubbletea"
 
-	"github.com/bavarianbidi/kubectl-dpm/pkg/profile"
-	"github.com/bavarianbidi/kubectl-dpm/pkg/table"
+	"github.com/bavarianbidi/kubectl-dpm/internal/profile"
+	"github.com/bavarianbidi/kubectl-dpm/internal/table"
 )
 
 type model struct {

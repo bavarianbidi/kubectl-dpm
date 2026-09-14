@@ -17,8 +17,8 @@ import (
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 
-	"github.com/bavarianbidi/kubectl-dpm/pkg/config"
-	"github.com/bavarianbidi/kubectl-dpm/pkg/profile"
+	"github.com/bavarianbidi/kubectl-dpm/internal/config"
+	"github.com/bavarianbidi/kubectl-dpm/internal/profile"
 )
 
 var (

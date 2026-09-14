@@ -48,14 +48,14 @@ Go tools are managed via `go.mod` `tool` directive, not globally installed:
 
 ```
 cmd/kubectl-dpm.go       # main entrypoint
-pkg/
+internal/
   command/               # cobra CLI commands and run logic
   config/                # koanf-based config loading
   profile/               # debug profile operations
   table/                 # table rendering (charmbracelet)
 ```
 
-- **No `internal/`** – everything under `pkg/` is implicitly internal to this plugin
+- **Internal structure** – everything under `internal/` is private to this plugin
 - **Main packages**: Cobra (CLI), k8s.io/client-go (Kubernetes), charmbracelet/* (TUI)
 
 ## Linting
@@ -84,9 +84,9 @@ cmdutil         // k8s.io/kubectl/pkg/cmd/util
 **goreleaser** (`v2`) config:
 - Builds for: linux/darwin × amd64/arm64
 - Version info injected via ldflags:
-  - `pkg/command.appVersion`
-  - `pkg/command.buildDate`
-  - `pkg/command.gitCommit`
+  - `internal/command.appVersion`
+  - `internal/command.buildDate`
+  - `internal/command.gitCommit`
 - Archive format: `tar.gz`
 - Extra release file: `tmp/kubectl-dpm.bom.spdx` (SBOM)
 
@@ -95,7 +95,7 @@ cmdutil         // k8s.io/kubectl/pkg/cmd/util
 ## Known Issues
 
 From `GOLANG_ANALYSIS.md`:
-- Global state in `pkg/command/run.go` (debugProfile, flagProfileName, flagImage, flagDebug)
+- Global state in `internal/command/run.go` (debugProfile, flagProfileName, flagImage, flagDebug)
 - `context.TODO()` used in pod listing (should use proper context)
 - Inconsistent error wrapping (mix of bare errors, `errors.Wrap`, `fmt.Errorf`)
 - Bare error returns lose context – should use `fmt.Errorf("context: %w", err)`

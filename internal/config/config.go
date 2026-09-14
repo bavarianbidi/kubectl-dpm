@@ -9,7 +9,7 @@ import (
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
 
-	"github.com/bavarianbidi/kubectl-dpm/pkg/profile"
+	"github.com/bavarianbidi/kubectl-dpm/internal/profile"
 )
 
 // ConfigurationFile is the path to the configuration file

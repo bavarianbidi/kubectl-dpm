@@ -7,8 +7,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/bavarianbidi/kubectl-dpm/pkg/config"
-	"github.com/bavarianbidi/kubectl-dpm/pkg/profile"
+	"github.com/bavarianbidi/kubectl-dpm/internal/config"
+	"github.com/bavarianbidi/kubectl-dpm/internal/profile"
 )
 
 func ValidateDebugProfileFile() *cobra.Command {

@@ -8,9 +8,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/bavarianbidi/kubectl-dpm/pkg/config"
-	"github.com/bavarianbidi/kubectl-dpm/pkg/profile"
-	table "github.com/bavarianbidi/kubectl-dpm/pkg/table"
+	"github.com/bavarianbidi/kubectl-dpm/internal/config"
+	"github.com/bavarianbidi/kubectl-dpm/internal/profile"
+	table "github.com/bavarianbidi/kubectl-dpm/internal/table"
 )
 
 func List() *cobra.Command {

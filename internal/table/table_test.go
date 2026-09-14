@@ -10,7 +10,7 @@ import (
 
 	bubbletable "github.com/charmbracelet/bubbles/table"
 
-	"github.com/bavarianbidi/kubectl-dpm/pkg/profile"
+	"github.com/bavarianbidi/kubectl-dpm/internal/profile"
 )
 
 func TestGenerateTable(t *testing.T) {

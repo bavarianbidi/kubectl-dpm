@@ -11,8 +11,8 @@ import (
 	"github.com/spf13/pflag"
 	"k8s.io/cli-runtime/pkg/genericiooptions"
 
-	"github.com/bavarianbidi/kubectl-dpm/pkg/command"
-	"github.com/bavarianbidi/kubectl-dpm/pkg/config"
+	"github.com/bavarianbidi/kubectl-dpm/internal/command"
+	"github.com/bavarianbidi/kubectl-dpm/internal/config"
 )
 
 func main() {
