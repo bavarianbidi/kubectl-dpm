@@ -22,10 +22,12 @@ import (
 )
 
 var (
+	// MatchVersionKubeConfigFlags contains kubeconfig flags with version matching.
 	MatchVersionKubeConfigFlags *cmdutil.MatchVersionFlags
 	debugProfile                profile.Profile
 )
 
+// NewCmdDebugProfile creates and returns the debug profile execution command.
 func NewCmdDebugProfile(streams genericiooptions.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "run",

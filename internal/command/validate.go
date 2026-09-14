@@ -11,6 +11,7 @@ import (
 	"github.com/bavarianbidi/kubectl-dpm/internal/profile"
 )
 
+// ValidateDebugProfileFile creates and returns the command to validate debug profiles.
 func ValidateDebugProfileFile() *cobra.Command {
 	return &cobra.Command{
 		Use:   "validate",

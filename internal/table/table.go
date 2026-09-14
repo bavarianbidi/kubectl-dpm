@@ -12,6 +12,7 @@ import (
 	"github.com/bavarianbidi/kubectl-dpm/internal/profile"
 )
 
+// GenerateTable builds an interactive bubbletea table model for displaying debug profiles.
 func GenerateTable(profiles []profile.Profile, wide bool) bubbletable.Model {
 	// generate the empty table
 	rows := []bubbletable.Row{}

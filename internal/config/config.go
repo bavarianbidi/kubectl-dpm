@@ -16,6 +16,7 @@ import (
 // is getting set by the root command as flag with default to ~/.kube/debug-profiles.yaml
 var ConfigurationFile string
 
+// GenerateConfig unmarshals the configuration file into the global profile Config.
 func GenerateConfig() error {
 	k := koanf.New(".")
 

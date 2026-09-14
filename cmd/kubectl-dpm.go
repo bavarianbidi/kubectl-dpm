@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+// Package main is the entrypoint for the kubectl-dpm plugin.
 package main
 
 import (

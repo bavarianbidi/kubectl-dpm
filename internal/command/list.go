@@ -13,6 +13,7 @@ import (
 	table "github.com/bavarianbidi/kubectl-dpm/internal/table"
 )
 
+// List creates and returns the cobra command for listing debug profiles.
 func List() *cobra.Command {
 	listCmd := &cobra.Command{
 		Use:   "list",

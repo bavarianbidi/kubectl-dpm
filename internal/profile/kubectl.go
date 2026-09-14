@@ -12,6 +12,7 @@ import (
 	kubectlversion "k8s.io/kubectl/pkg/cmd/version"
 )
 
+// CheckKubectlVersion verifies that the kubectl client version meets the minimum requirement.
 func CheckKubectlVersion() error {
 	// nolint:gosec
 	kubeclVersionCmd := exec.Command(
