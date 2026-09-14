@@ -17,15 +17,17 @@ import (
 	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 
-	"github.com/bavarianbidi/kubectl-dpm/pkg/config"
-	"github.com/bavarianbidi/kubectl-dpm/pkg/profile"
+	"github.com/bavarianbidi/kubectl-dpm/internal/config"
+	"github.com/bavarianbidi/kubectl-dpm/internal/profile"
 )
 
 var (
+	// MatchVersionKubeConfigFlags contains kubeconfig flags with version matching.
 	MatchVersionKubeConfigFlags *cmdutil.MatchVersionFlags
 	debugProfile                profile.Profile
 )
 
+// NewCmdDebugProfile creates and returns the debug profile execution command.
 func NewCmdDebugProfile(streams genericiooptions.IOStreams) *cobra.Command {
 	cmd := &cobra.Command{
 		Use: "run",
@@ -190,12 +192,11 @@ func run(ctx context.Context, args []string, streams genericiooptions.IOStreams)
 				return fmt.Errorf("create temp file for profile spec: %w", err)
 			}
 			defer os.Remove(tmpFile.Name())
+			defer tmpFile.Close()
 
 			if _, err := tmpFile.Write(specData); err != nil {
-				tmpFile.Close()
 				return fmt.Errorf("write profile spec to temp file: %w", err)
 			}
-			tmpFile.Close()
 
 			if flagDebug {
 				fmt.Fprintf(streams.Out, "profile spec written to temp file: %s\n", tmpFile.Name())

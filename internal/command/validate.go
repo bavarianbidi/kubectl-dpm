@@ -7,10 +7,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/bavarianbidi/kubectl-dpm/pkg/config"
-	"github.com/bavarianbidi/kubectl-dpm/pkg/profile"
+	"github.com/bavarianbidi/kubectl-dpm/internal/config"
+	"github.com/bavarianbidi/kubectl-dpm/internal/profile"
 )
 
+// ValidateDebugProfileFile creates and returns the command to validate debug profiles.
 func ValidateDebugProfileFile() *cobra.Command {
 	return &cobra.Command{
 		Use:   "validate",

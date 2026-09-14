@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+//nolint:goconst
 package profile
 
 import (
@@ -117,10 +118,10 @@ func setupTestGitRepo(t *testing.T, profileContent string, profilePath string) s
 
 	// Create profile file
 	fullPath := filepath.Join(repoPath, profilePath)
-	if err := os.MkdirAll(filepath.Dir(fullPath), 0755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(fullPath), 0o750); err != nil {
 		t.Fatalf("failed to create directory: %v", err)
 	}
-	if err := os.WriteFile(fullPath, []byte(profileContent), 0600); err != nil {
+	if err := os.WriteFile(fullPath, []byte(profileContent), 0o600); err != nil {
 		t.Fatalf("failed to write profile file: %v", err)
 	}
 
@@ -323,23 +324,10 @@ func TestGitProfileSource_GetSpec_WithToken(t *testing.T) {
 
 	repoPath := setupTestGitRepo(t, testValidProfile, "profile.json")
 
-	// Set a dummy token (won't be used since repo is local)
-	originalToken := os.Getenv("KUBECTL_DPM_GIT_TOKEN")
-	defer func() {
-		if originalToken != "" {
-			os.Setenv("KUBECTL_DPM_GIT_TOKEN", originalToken)
-		} else {
-			os.Unsetenv("KUBECTL_DPM_GIT_TOKEN")
-		}
-	}()
-
-	if err := os.Setenv("KUBECTL_DPM_GIT_TOKEN", "dummy-token"); err != nil {
-		t.Fatalf("failed to set env var: %v", err)
-	}
+	t.Setenv("KUBECTL_DPM_GIT_TOKEN", "dummy-token")
 
 	source := NewGitProfileSource(repoPath, "main", "profile.json")
 	spec, err := source.GetSpec(context.Background())
-
 	if err != nil {
 		t.Errorf("GitProfileSource.GetSpec() with token failed: %v", err)
 		return
@@ -364,7 +352,6 @@ func TestGitProfileSource_GetSpec_ContextCancellation(t *testing.T) {
 
 	source := NewGitProfileSource(repoPath, "main", "profile.json")
 	_, err := source.GetSpec(ctx)
-
 	// The git clone might complete before context is checked, so we just verify
 	// that if there's an error, it's reasonable
 	if err != nil {

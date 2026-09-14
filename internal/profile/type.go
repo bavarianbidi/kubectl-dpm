@@ -6,6 +6,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 )
 
+// Profile defines a debug profile configuration.
 type Profile struct {
 	ProfileName     string              `koanf:"name" yaml:"name" validate:"required"`
 	Profile         string              `koanf:"profile" yaml:"profile"`             // DEPRECATED: use ProfileSource instead
@@ -21,6 +22,7 @@ type Profile struct {
 	source         ProfileSource // resolved ProfileSource implementation
 }
 
+// Style defines styling configuration for the table output.
 type Style struct {
 	HeaderForegroundColor   string `koanf:"headerForegroundColor" yaml:"headerForegroundColor"`
 	HeaderBackgroundColor   string `koanf:"headerBackgroundColor" yaml:"headerBackgroundColor"`
@@ -28,27 +30,32 @@ type Style struct {
 	SelectedBackgroundColor string `koanf:"selectedBackgroundColor" yaml:"selectedBackgroundColor"`
 }
 
+// CustomDebugProfile defines the root configuration structure for profiles.
 type CustomDebugProfile struct {
 	Profiles    []Profile `koanf:"profiles" yaml:"profiles"`
 	KubectlPath string    `koanf:"kubectlPath" yaml:"kubectlPath"`
 	Style       Style     `koanf:"style" yaml:"style"`
 }
 
-// global Profile configuration
+// Config is the global profile configuration.
 var Config CustomDebugProfile
 
+// IsBuiltInProfile reports whether the profile is a built-in profile.
 func (p *Profile) IsBuiltInProfile() bool {
 	return p.builtInProfile
 }
 
+// SetBuiltInProfile sets whether the profile is a built-in profile.
 func (p *Profile) SetBuiltInProfile(b bool) {
 	p.builtInProfile = b
 }
 
+// GetSource returns the profile's underlying source implementation.
 func (p *Profile) GetSource() ProfileSource {
 	return p.source
 }
 
+// SetSource sets the profile's underlying source implementation.
 func (p *Profile) SetSource(s ProfileSource) {
 	p.source = s
 }

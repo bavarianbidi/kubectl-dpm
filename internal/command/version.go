@@ -21,6 +21,7 @@ var (
 	gitCommit string
 )
 
+// Version creates and returns the version command.
 func Version() *cobra.Command {
 	return &cobra.Command{
 		Use:   "version",

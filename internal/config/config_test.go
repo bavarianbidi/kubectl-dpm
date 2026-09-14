@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 
+//nolint:goconst
 package config
 
 import (
 	"reflect"
 	"testing"
 
-	"github.com/bavarianbidi/kubectl-dpm/pkg/profile"
+	"github.com/bavarianbidi/kubectl-dpm/internal/profile"
 )
 
 func TestGenerateConfig(t *testing.T) {

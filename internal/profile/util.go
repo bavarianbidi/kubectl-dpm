@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// SortProfiles sorts the global profiles list alphabetically by profile name.
 func SortProfiles() {
 	// sort profiles by name
 	slices.SortFunc(Config.Profiles, func(a, b Profile) int {
@@ -16,6 +17,7 @@ func SortProfiles() {
 	})
 }
 
+// GetProfileIdx returns the index of a profile matching the given profile name.
 func GetProfileIdx(profileName string) (int, error) {
 	// get the index of the profile where the profile name matches
 	idx := slices.IndexFunc(Config.Profiles, func(c Profile) bool { return c.ProfileName == profileName })

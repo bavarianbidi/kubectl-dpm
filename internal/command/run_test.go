@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+//nolint:goconst
 package command
 
 import (
@@ -8,7 +9,7 @@ import (
 	"k8s.io/cli-runtime/pkg/genericclioptions"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 
-	"github.com/bavarianbidi/kubectl-dpm/pkg/profile"
+	"github.com/bavarianbidi/kubectl-dpm/internal/profile"
 )
 
 func TestGetTargetNamespace(t *testing.T) {

@@ -9,13 +9,14 @@ import (
 	"github.com/knadh/koanf/parsers/yaml"
 	"github.com/knadh/koanf/providers/file"
 
-	"github.com/bavarianbidi/kubectl-dpm/pkg/profile"
+	"github.com/bavarianbidi/kubectl-dpm/internal/profile"
 )
 
 // ConfigurationFile is the path to the configuration file
 // is getting set by the root command as flag with default to ~/.kube/debug-profiles.yaml
 var ConfigurationFile string
 
+// GenerateConfig unmarshals the configuration file into the global profile Config.
 func GenerateConfig() error {
 	k := koanf.New(".")
 

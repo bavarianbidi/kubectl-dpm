@@ -17,6 +17,7 @@ import (
 	kubectldebug "k8s.io/kubectl/pkg/cmd/debug"
 )
 
+// ValidateDebugProfileFile validates the kubectl path and all configured profiles.
 func ValidateDebugProfileFile(ctx context.Context) error {
 	if err := ValidateKubectlPath(); err != nil {
 		return fmt.Errorf("validate kubectl path: %w", err)
@@ -29,6 +30,7 @@ func ValidateDebugProfileFile(ctx context.Context) error {
 	return nil
 }
 
+// ValidateKubectlPath verifies that the configured kubectl path is valid and executable.
 func ValidateKubectlPath() error {
 	// if plugin is called from kubectl, we do not
 	// check the kubectl path
@@ -54,6 +56,7 @@ func ValidateKubectlPath() error {
 	return nil
 }
 
+// ValidateAllProfiles validates each configured debug profile and ensures unique names.
 func ValidateAllProfiles(ctx context.Context) error {
 	// sort profiles by name
 	SortProfiles()

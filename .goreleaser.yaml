@@ -15,9 +15,9 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - -X github.com/bavarianbidi/kubectl-dpm/pkg/command.appVersion={{.Version}}
-      - -X github.com/bavarianbidi/kubectl-dpm/pkg/command.buildDate={{.Date}}
-      - -X github.com/bavarianbidi/kubectl-dpm/pkg/command.gitCommit={{.Commit}}
+      - -X github.com/bavarianbidi/kubectl-dpm/internal/command.appVersion={{.Version}}
+      - -X github.com/bavarianbidi/kubectl-dpm/internal/command.buildDate={{.Date}}
+      - -X github.com/bavarianbidi/kubectl-dpm/internal/command.gitCommit={{.Commit}}
     main: ./cmd/kubectl-dpm.go
 
 archives:
