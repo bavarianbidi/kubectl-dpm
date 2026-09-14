@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+//nolint:goconst
 package config
 
 import (

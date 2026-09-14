@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 
+//nolint:goconst
 package profile
 
 import (
@@ -40,7 +41,7 @@ func TestFileProfileSource_GetSpec(t *testing.T) {
 			setup: func(t *testing.T) string {
 				t.Helper()
 				path := filepath.Join(tmpDir, "valid.json")
-				if err := os.WriteFile(path, []byte(testValidProfile), 0600); err != nil {
+				if err := os.WriteFile(path, []byte(testValidProfile), 0o600); err != nil {
 					t.Fatalf("failed to create test file: %v", err)
 				}
 				return path
@@ -61,7 +62,7 @@ func TestFileProfileSource_GetSpec(t *testing.T) {
 			setup: func(t *testing.T) string {
 				t.Helper()
 				path := filepath.Join(tmpDir, "invalid.json")
-				if err := os.WriteFile(path, []byte(invalidJSON), 0600); err != nil {
+				if err := os.WriteFile(path, []byte(invalidJSON), 0o600); err != nil {
 					t.Fatalf("failed to create test file: %v", err)
 				}
 				return path
@@ -74,7 +75,7 @@ func TestFileProfileSource_GetSpec(t *testing.T) {
 			setup: func(t *testing.T) string {
 				t.Helper()
 				path := filepath.Join(tmpDir, "wrong.json")
-				if err := os.WriteFile(path, []byte(wrongStructure), 0600); err != nil {
+				if err := os.WriteFile(path, []byte(wrongStructure), 0o600); err != nil {
 					t.Fatalf("failed to create test file: %v", err)
 				}
 				return path
@@ -91,7 +92,7 @@ func TestFileProfileSource_GetSpec(t *testing.T) {
 					t.Fatalf("failed to set env var: %v", err)
 				}
 				path := filepath.Join(testDir, "env.json")
-				if err := os.WriteFile(path, []byte(testValidProfile), 0600); err != nil {
+				if err := os.WriteFile(path, []byte(testValidProfile), 0o600); err != nil {
 					t.Fatalf("failed to create test file: %v", err)
 				}
 				return "${TEST_PROFILE_DIR}/env.json"
