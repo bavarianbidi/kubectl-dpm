@@ -190,12 +190,11 @@ func run(ctx context.Context, args []string, streams genericiooptions.IOStreams)
 				return fmt.Errorf("create temp file for profile spec: %w", err)
 			}
 			defer os.Remove(tmpFile.Name())
+			defer tmpFile.Close()
 
 			if _, err := tmpFile.Write(specData); err != nil {
-				tmpFile.Close()
 				return fmt.Errorf("write profile spec to temp file: %w", err)
 			}
-			tmpFile.Close()
 
 			if flagDebug {
 				fmt.Fprintf(streams.Out, "profile spec written to temp file: %s\n", tmpFile.Name())
